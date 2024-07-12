@@ -27,7 +27,7 @@ class AdvTargetPoint : public FairMCPoint
 
     AdvTargetPoint(Int_t trackID,
                    Int_t detID,
-                   TVector3 entrypoint,
+                   TVector3 pos,
                    TVector3 mom,
                    Double_t tof,
                    Double_t length,
