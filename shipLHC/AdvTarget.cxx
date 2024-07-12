@@ -265,7 +265,7 @@ Bool_t AdvTarget::ProcessHits(FairVolume *vol)
                fLength,
                fELoss,
                pdgCode,
-               TVector3(ExitPoint.X(), ExitPoint.Y(), ExitPoint.Z())));
+               TVector3(ExitPoint.X(), ExitPoint.Y(), ExitPoint.Z()));
 
         // Increment number of det points in TParticle
         ShipStack *stack = (ShipStack *)gMC->GetStack();
@@ -304,7 +304,7 @@ AdvTargetPoint *AdvTarget::AddHit(Int_t trackID,
                                   Double_t time,
                                   Double_t length,
                                   Double_t eLoss,
-                                  Int_t pdgCode, 
+                                  Int_t pdgCode,
                                   TVector3 exitpoint)
 {
     TClonesArray &clref = *fAdvTargetPointCollection;
