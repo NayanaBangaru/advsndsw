@@ -54,7 +54,7 @@ class AdvTarget : public FairDetector
      */
     AdvTargetPoint *AddHit(Int_t trackID,
                            Int_t detID,
-                           TVector3 pos,
+                           TVector3 entrypoint,
                            TVector3 mom,
                            Double_t time,
                            Double_t length,
