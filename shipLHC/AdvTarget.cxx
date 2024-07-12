@@ -259,7 +259,7 @@ Bool_t AdvTarget::ProcessHits(FairVolume *vol)
         Double_t zmean = (fEntryPoint.Z() + exit_point.Z()) / 2.;
         AddHit(fTrackID,
                fVolumeID,
-               TVector3(EntryPoint.X(), EntryPoint.Y(), EntryPoint.Z()),
+               TVector3(xmean, ymean, zmean),
                TVector3(fMom.Px(), fMom.Py(), fMom.Pz()),
                fTime,
                fLength,
