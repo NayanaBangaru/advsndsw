@@ -1,0 +1,18 @@
+[ ShipField.so ]
+# List of selected classes
+class ShipBFieldMap
+class ShipBellField
+class ShipCompField
+class ShipConstField
+class ShipFieldCreator
+class ShipFieldMaker
+class ShipFieldPar
+class ShipGoliathField
+header ShipBFieldMap.h
+header ShipBellField.h
+header ShipCompField.h
+header ShipConstField.h
+header ShipFieldCreator.h
+header ShipFieldMaker.h
+header ShipFieldPar.h
+header ShipGoliathField.h

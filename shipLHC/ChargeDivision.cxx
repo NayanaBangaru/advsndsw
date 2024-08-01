@@ -48,8 +48,9 @@ void ChargeDivision::ReadPulseShape(std::string PulseFileName)
     // check if pulse correction is needed
 }
 
-std::vector<float> ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
+void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
 {
+
     for (int i = 0; i < V.size(); i++) {
         Int_t pdgcode = V[i]->PdgCode();
         double ParticleMass = TDatabasePDG::Instance()->GetParticle(pdgcode)->Mass();
@@ -65,36 +66,33 @@ std::vector<float> ChargeDivision::Divide(Int_t detID, const std::vector<AdvTarg
         // check if this is correct
         // to be put in config files
         // calculating number of strips WITHOUT lorentz angle
-        float NumberofStrips;
+        
         // find correct pitch value
-        float StripPitch = 80e-6;
-        float StripWidth = 0.25 * StripPitch;
-        Int_t ChargeDivisionsperStrip = 10;
-        Int_t NumberofSegments = 0;
         if (ParticleCharge == 0) {
             NumberofSegments = 1;
         } else {
-            NumberofStrips = ceil(V[i]->GetEntryPoint().X() - V[i]->GetExitPoint().X()) / (StripWidth + StripPitch);
-            NumberofSegments = ChargeDivisionsperStrip * NumberofStrips;
+            NumberofStrips = V[i]->GetEntryPoint().X() - V[i]->GetExitPoint().X();
+            // / (StripWidth + StripPitch);
+            // NumberofSegments = ChargeDivisionsperStrip * NumberofStrips;
         }
-        // cout << NumberofSegments << endl;
+        // std::cout << NumberofSegments << std::endl;
 
-        Double_t seglen = V[i]->GetLength() / NumberofSegments;
+        // Double_t seglen = V[i]->GetLength() / NumberofSegments;
 
-        SiG4UniversalFluctuation sig4fluct{};
-        sig4fluct.InitialiseMe(pdgcode);
+        // SiG4UniversalFluctuation sig4fluct{};
+        // sig4fluct.InitialiseMe(pdgcode);
 
-        Double_t El = V[i]->GetEnergyLoss() / NumberofSegments;
+        // Double_t El = V[i]->GetEnergyLoss() / NumberofSegments;
 
-        // check which coordinate to consider
-        Double_t momentum = V[i]->GetPx();
-        // Double_t fluctEnergy[NumberofSegments];
-        std::vector<float> fluctEnergy;
+        // // check which coordinate to consider
+        // Double_t momentum = V[i]->GetPx();
+        // // Double_t fluctEnergy[NumberofSegments];
+        // std::vector<float> fluctEnergy;
 
-        for (Int_t i = 0; i < NumberofSegments; i++) {
+        // for (Int_t i = 0; i < NumberofSegments; i++) {
 
-            fluctEnergy.push_back(sig4fluct.SampleFluctuations(El, momentum, seglen));
-        }
-        return fluctEnergy;
+        //     fluctEnergy.push_back(sig4fluct.SampleFluctuations(El, momentum, seglen));
+        // }
+        // return fluctEnergy;
     }
 }

@@ -1,0 +1,16 @@
+[ ShipData.so ]
+# List of selected classes
+class Hit2MCPoints
+class ShipHit
+class ShipMCTrack
+class ShipParticle
+class ShipStack
+class SndlhcHit
+class TrackInfo
+header Hit2MCPoints.h
+header ShipHit.h
+header ShipMCTrack.h
+header ShipParticle.h
+header ShipStack.h
+header SndlhcHit.h
+header TrackInfo.h

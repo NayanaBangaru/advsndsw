@@ -1,0 +1,22 @@
+[ ShipPassive.so ]
+# List of selected classes
+class MufluxTargetStation
+class ShipCave
+class ShipChamber
+class ShipGeoCave
+class ShipGoliath
+class ShipMagnet
+class ShipMuonShield
+class ShipPassiveContFact
+class ShipTAUMagneticSpectrometer
+class ShipTargetStation
+header MufluxTargetStation.h
+header ShipCave.h
+header ShipChamber.h
+header ShipGeoCave.h
+header ShipGoliath.h
+header ShipMagnet.h
+header ShipMuonShield.h
+header ShipPassiveContFact.h
+header ShipTAUMagneticSpectrometer.h
+header ShipTargetStation.h

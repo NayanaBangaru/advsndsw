@@ -1,0 +1,12 @@
+[ veto.so ]
+# List of selected classes
+class veto
+class vetoContFact
+class vetoHit
+class vetoHitOnTrack
+class vetoPoint
+header veto.h
+header vetoContFact.h
+header vetoHit.h
+header vetoHitOnTrack.h
+header vetoPoint.h
