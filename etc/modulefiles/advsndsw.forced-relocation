@@ -1,0 +1,34 @@
+#%Module1.0
+proc ModulesHelp { } {
+global version
+puts stderr "SND\@LHC Modulefile for advsndsw main-@@PKGREVISION@e563c14a94bc8f5fbec7d19487c37baa2e9ee394@@"
+}
+set version main-@@PKGREVISION@e563c14a94bc8f5fbec7d19487c37baa2e9ee394@@
+module-whatis "SND\@LHC Modulefile for advsndsw main-@@PKGREVISION@e563c14a94bc8f5fbec7d19487c37baa2e9ee394@@"
+# Dependencies
+module load BASE/1.0 \
+     \
+     \
+     \
+     \
+     \
+    
+# Our environment
+setenv EOSSND root://eospublic.cern.ch/
+setenv ADVSNDSW_ROOT $::env(BASEDIR)/advsndsw/$version
+setenv ADVSNDSW_HASH 21d1e1d54395c535e496044a4ce99943c0e8d4b9
+setenv FAIRSHIP $::env(ADVSNDSW_ROOT)
+setenv FAIRSHIP_ROOT $::env(ADVSNDSW_ROOT)
+setenv VMCWORKDIR $::env(ADVSNDSW_ROOT)
+setenv GEOMPATH $::env(ADVSNDSW_ROOT)/geometry
+setenv CONFIG_DIR $::env(ADVSNDSW_ROOT)/gconfig
+setenv GALGCONF $::env(ADVSNDSW_ROOT)/shipgen/genie_config
+prepend-path PATH $::env(ADVSNDSW_ROOT)/bin
+prepend-path LD_LIBRARY_PATH $::env(ADVSNDSW_ROOT)/lib
+setenv FAIRLIBDIR $::env(ADVSNDSW_ROOT)/lib
+prepend-path ROOT_INCLUDE_PATH $::env(ADVSNDSW_ROOT)/include
+prepend-path PYTHONPATH $::env(ADVSNDSW_ROOT)/python
+append-path PYTHONPATH $::env(ADVSNDSW_ROOT)/shipLHC/scripts
+append-path PYTHONPATH $::env(ADVSNDSW_ROOT)/shipLHC/rawData
+append-path PYTHONPATH $::env(XROOTD_ROOT)/lib/python/site-packages
+

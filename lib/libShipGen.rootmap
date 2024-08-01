@@ -1,0 +1,32 @@
+[ ShipGen.so ]
+# List of selected classes
+class ALPACAGenerator
+class CosmicsGenerator
+class DPPythia8Generator
+class FixedTargetGenerator
+class GenieGenerator
+class HNLPythia8Generator
+class MuDISGenerator
+class MuonBackGenerator
+class NeutronGenerator_FLUKA
+class NtupleGenerator
+class NtupleGenerator_FLUKA
+class NuageGenerator
+class Pythia6Generator
+class Pythia8Generator
+class tPythia6Generator
+header ALPACAGenerator.h
+header CosmicsGenerator.h
+header DPPythia8Generator.h
+header FixedTargetGenerator.h
+header GenieGenerator.h
+header HNLPythia8Generator.h
+header MuDISGenerator.h
+header MuonBackGenerator.h
+header NeutronGenerator_FLUKA.h
+header NtupleGenerator.h
+header NtupleGenerator_FLUKA.h
+header NuageGenerator.h
+header Pythia6Generator.h
+header Pythia8Generator.h
+header tPythia6Generator.h
