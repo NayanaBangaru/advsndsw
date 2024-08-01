@@ -1,0 +1,6 @@
+[ sndFairTasks.so ]
+# List of selected classes
+class ConvRawData
+class DigiTaskSND
+header ConvRawData.h
+header DigiTaskSND.h
