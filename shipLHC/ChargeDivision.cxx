@@ -3,6 +3,8 @@
 #include "AdvTargetPoint.h"
 #include "SiG4UniversalFluctuation.h"
 
+#include <cmath>
+
 #include <TDatabasePDG.h>
 #include <fstream>
 #include <iostream>
@@ -48,14 +50,16 @@ void ChargeDivision::ReadPulseShape(std::string PulseFileName)
     // check if pulse correction is needed
 }
 
-void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
+std::vector<Double_t> ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
 {
+    //return 0.33;
 
+    // Int_t pdgcode = V[0]->PdgCode();
+    // double ParticleMass = TDatabasePDG::Instance()->GetParticle(pdgcode)->Mass();
+    // return ParticleMass;
+    std::vector<Double_t> fluctEnergy;
     for (int i = 0; i < V.size(); i++) {
-        Int_t pdgcode = V[i]->PdgCode();
-        double ParticleMass = TDatabasePDG::Instance()->GetParticle(pdgcode)->Mass();
-        double ParticleCharge = TDatabasePDG::Instance()->GetParticle(pdgcode)->Charge();
-
+        
         // lorentz angle - check how it changes with radiation damaged sensors
         // need to develop logic that can calculate the lorentz angle for different temperatures, depletion voltage and
         // bias voltage !!! value below taken from "Determination of the Lorentz Angle in Microstrip Silicon Detectors
@@ -67,32 +71,52 @@ void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
         // to be put in config files
         // calculating number of strips WITHOUT lorentz angle
         
+        
+        Int_t pdgcode = V[i]->PdgCode();
+        if (TDatabasePDG::Instance()->GetParticle(pdgcode)) {
+            ParticleMass = TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Mass();
+            ParticleCharge = TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Charge();
+        }
+        else{
+            cout << "Couldn't find particle " << pdgcode << endl; 
+        };
+        
+        double a = V[i]->GetEntryPoint().X() - V[i]->GetExitPoint().X();
+        double b = V[i]->GetEntryPoint().Z() - V[i]->GetExitPoint().Z();
+        double c = sqrt(pow(a,2) + pow(b,2));
+
+        
         // find correct pitch value
-        if (ParticleCharge == 0) {
+        if (fabs(ParticleMass) < 1e-6 || ParticleCharge == 0) {
             NumberofSegments = 1;
         } else {
-            NumberofStrips = V[i]->GetEntryPoint().X() - V[i]->GetExitPoint().X();
-            // / (StripWidth + StripPitch);
-            // NumberofSegments = ChargeDivisionsperStrip * NumberofStrips;
+            NumberofSegments = ChargeDivisionsperStrip*abs(c/b);
         }
-        // std::cout << NumberofSegments << std::endl;
+        
+        segLen = c/NumberofSegments; //check why some are seglen are too small 
 
-        // Double_t seglen = V[i]->GetLength() / NumberofSegments;
-
-        // SiG4UniversalFluctuation sig4fluct{};
+        SiG4UniversalFluctuation sig4fluct{};
         // sig4fluct.InitialiseMe(pdgcode);
 
-        // Double_t El = V[i]->GetEnergyLoss() / NumberofSegments;
+        Double_t El = V[i]->GetEnergyLoss() / NumberofSegments;
 
-        // // check which coordinate to consider
-        // Double_t momentum = V[i]->GetPx();
-        // // Double_t fluctEnergy[NumberofSegments];
-        // std::vector<float> fluctEnergy;
+        // check which coordinate to consider
+        Double_t momentum = V[i]->GetPx();
+        // Double_t fluctEnergy[NumberofSegments];
+        
+        cout << "NUM :" << NumberofSegments << endl; 
+        // cout << "pdgcode : " << pdgcode << endl;
+        if (NumberofSegments > 1) {
+        for (Int_t j = 0; j < NumberofSegments; j++) {
 
-        // for (Int_t i = 0; i < NumberofSegments; i++) {
-
-        //     fluctEnergy.push_back(sig4fluct.SampleFluctuations(El, momentum, seglen));
-        // }
-        // return fluctEnergy;
+            //cout << sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, El, momentum, segLen) << endl; 
+           sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, El, momentum, segLen); 
+            
+            fluctEnergy.push_back(sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, El, momentum, segLen));
+        }
+        }
+        else {fluctEnergy.push_back(V[i]->GetEnergyLoss());}
+        
     }
+    return fluctEnergy;
 }
