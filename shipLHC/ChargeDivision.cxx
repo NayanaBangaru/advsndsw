@@ -44,11 +44,13 @@ void ChargeDivision::ReadPulseShape(std::string PulseFileName)
                 }
             }
         }
-        double max_value = *max_element(PulseValues.begin(), PulseValues.end());
-        if (abs(max_value - 1)>numeric_limits<double>::epsilon())
+        const auto max_value = max_element(PulseValues.begin(), PulseValues.end());
+        if (abs(*max_value - 1)>numeric_limits<double>::epsilon())
         {
            throw invalid_argument( "Maximum value of pulse shape not 1." );
         }
+
+        unsigned int pulset0Idx = std::distance(PulseValues.begin(), max_value);
     }
     // get the vector of beginning to max of the pulse
     // check if pulse correction is needed
