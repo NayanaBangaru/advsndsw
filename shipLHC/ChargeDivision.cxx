@@ -3,6 +3,7 @@
 #include "AdvTargetPoint.h"
 #include "SiG4UniversalFluctuation.h"
 #include "EnergyFluctUnit.h"
+#include "TVector3.h"
 
 #include <TDatabasePDG.h>
 #include <cmath>
@@ -57,10 +58,18 @@ void ChargeDivision::ReadPulseShape(std::string PulseFileName)
     // check if pulse correction is needed
 }
 
+TVector3 ChargeDivision::DriftDir(TVector3 EntryPoint, TVector3 ExitPoint, float length)
+{   
+    TVector3 DriftDirUnit = (EntryPoint - ExitPoint).Unit();
+    TVector3 DriftMul = DriftDirUnit*length;
+    TVector3 DriftPos = EntryPoint - (DriftDirUnit*length);
+    return DriftPos; 
+}
+
 EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
 {
 
-    std::vector<Double_t> fluctEnergy;
+
     for (int i = 0; i < V.size(); i++) {
 
         // lorentz angle - check how it changes with radiation damaged sensors
@@ -71,7 +80,8 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
         // not required for target
 
         // mass, momentum, energy loss in MeV, segment length in mm
-
+        std::vector<Double_t> fluctEnergy;
+        std::vector<TVector3> driftPos;
         Int_t pdgcode = V[i]->PdgCode();
         if (TDatabasePDG::Instance()->GetParticle(pdgcode)) {
             ParticleMass = (TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Mass()) * 1000;
@@ -79,24 +89,21 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
         } else {
             cout << "Couldn't find particle " << pdgcode << endl;
         };
+ 
+        double len = ( V[i]->GetEntryPoint() -  V[i]->GetExitPoint()).Mag();
 
-        double a = V[i]->GetEntryPoint().X() - V[i]->GetExitPoint().X();
-        double b = V[i]->GetEntryPoint().Z() - V[i]->GetExitPoint().Z();
-        double c = V[i]->GetEntryPoint().Y() - V[i]->GetExitPoint().Y();
-        double len = sqrt(pow(a, 2) + pow(b, 2) +  pow(c, 2));
-
-        if (fabs(ParticleMass) < 1e-6 || ParticleCharge == 0 || len < 1e-3) {
+        if (fabs(ParticleMass) < 1e-6 || ParticleCharge == 0) {
             NumberofSegments = 1;
         } else {
-            NumberofSegments = ChargeDivisionsperStrip * abs(len / b); //check if this is the best way 
+            NumberofSegments = 1 + (ChargeDivisionsperStrip * abs(( V[i]->GetEntryPoint().X() -  V[i]->GetExitPoint().X()) / StripPitch)); //check if this is the correct way 
         }
 
-        segLen = (len / NumberofSegments) * 10;   // in mm // check why some are seglen are too small
+        segLen = (len / NumberofSegments) * 10;   // in mm 
 
         SiG4UniversalFluctuation sig4fluct{};
 
         Double_t Etotal = V[i]->GetEnergyLoss() * 1000;
-        Double_t Emean = Etotal / NumberofSegments;
+        Double_t Emean = Etotal / NumberofSegments;  
 
         // check which coordinate to consider
         Double_t momentum = V[i]->GetPx() * 1000;
@@ -107,13 +114,13 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
                 sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen);
                 fluctEnergy.push_back(
                     sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen));
+                driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), segLen*j));
             }
         } else {
             fluctEnergy.push_back(V[i]->GetEnergyLoss() * 1000);
         }
 
         double sume = 0;
-        // Write to the file
         for (int n = 0; n < size(fluctEnergy); n++) {
             sume = sume + fluctEnergy[n];
         }
@@ -123,7 +130,7 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
                 fluctEnergy[m] = fluctEnergy[m] * rescale_ratio;
             }
         }
-    }
-    EnergyFluctUnit ELossVector(fluctEnergy, segLen);
+    EnergyFluctUnit ELossVector(fluctEnergy, segLen, driftPos);
     return ELossVector;
+    }
 }

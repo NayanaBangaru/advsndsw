@@ -43,6 +43,7 @@ class AdvTargetHit : public SndlhcHit
     std::vector<Double_t> EFluct;
     int EFluctSize;
     float segLen; 
+    std::vector<TVector3> DriftPos;
     ClassDef(AdvTargetHit, 1);
 };
 
