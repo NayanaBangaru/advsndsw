@@ -47,6 +47,7 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V)
     EnergyFluctUnit EnergyLossVector = chargedivision.Divide(detID, V);
     EFluct = EnergyLossVector.getEfluct();
     segLen = EnergyLossVector.getsegLen();
+    DriftPos = EnergyLossVector.getDriftPos();
     if (EFluct.empty()) {
         EFluctSize = 0;
     } else {
