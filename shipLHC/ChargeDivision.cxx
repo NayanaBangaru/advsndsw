@@ -57,7 +57,7 @@ void ChargeDivision::ReadPulseShape(std::string PulseFileName)
     // check if pulse correction is needed
 }
 
-std::vector<Double_t> ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
+EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
 {
 
     std::vector<Double_t> fluctEnergy;
@@ -124,5 +124,6 @@ std::vector<Double_t> ChargeDivision::Divide(Int_t detID, const std::vector<AdvT
             }
         }
     }
-    return fluctEnergy;
+    EnergyFluctUnit ELossVector(fluctEnergy, segLen);
+    return ELossVector;
 }

@@ -1,3 +1,6 @@
+#ifndef SHIPLHC_ENERGYFLUCTUNIT_H_
+#define SHIPLHC_ENERGYFLUCTUNIT_H_
+
 #include <iostream>
 
 class EnergyFluctUnit 
@@ -17,3 +20,5 @@ class EnergyFluctUnit
     std::vector<Double_t> Efluct_;
     float segLen_;
 };
+
+#endif 
