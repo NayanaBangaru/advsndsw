@@ -1,4 +1,4 @@
-"""Perform Hough Transform pattern recognition and a track fit."""
+"""Permofrm Houhg Transform pattern recognition and a track fit."""
 
 import ROOT
 import numpy as np
