@@ -97,8 +97,8 @@
            <xH_min_yz unit="cm">  0.  </xH_min_yz>
            <xH_max_yz unit="cm">  122. </xH_max_yz>
      </Hough_space_format>
-     <!-- Helpers to select one HT space maximum among many.
-          The n-th quantile of found peaks along 'slope' axis(yH axis) must enclose
+     <!-- Helpers to select one HT space maxima among many.
+          The n-th quantile of found peaks along 'slope' axis(yH axis) must enlose
           n_quantile portion of all maxima 'slope' bins within a res range.
           If smoothing is active, n_quantile and res are not used!  -->
      <n_quantile> 0 </n_quantile>
@@ -181,8 +181,8 @@
            <xH_min_yz unit="cm"> -35.  </xH_min_yz>
            <xH_max_yz unit="cm">  105. </xH_max_yz>
      </Hough_space_format>
-     <!-- Helpers to select one HT space maximum among many.
-          The n-th quantile of found peaks along 'slope' axis(yH axis above) must enclose
+     <!-- Helpers to select one HT space maxima among many.
+          The n-th quantile of found peaks along 'slope' axis(yH axis above) must enlose
           n_quantile portion of all maxima 'slope' bins within a res range.
           If smoothing is active, n_quantile and res are not used!  -->
      <n_quantile> 0.5 </n_quantile>
