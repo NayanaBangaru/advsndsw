@@ -6,19 +6,18 @@
 
 #include <iostream>
 #include <vector>
-using namespace std; 
+using namespace std;
 
-class AdvDigitisation{
-    public:
-        AdvDigitisation();
-        void digirun(Int_t detID, const std::vector<AdvTargetPoint*>& V);
-    
-    protected: 
-        
-        std::vector<Double_t> EFluct;
-        int EFluctSize;
-        float segLen; 
-        //std::vector<TVector3>* DriftPos = nullptr;
+class AdvDigitisation
+{
+  public:
+    AdvDigitisation();
+    void digirun(Int_t detID, const std::vector<AdvTargetPoint*>& V);
 
+  protected:
+    std::vector<Double_t> EFluct;
+    int EFluctSize;
+    float segLen;
+    std::vector<TVector3> DriftPos;
 };
 #endif
