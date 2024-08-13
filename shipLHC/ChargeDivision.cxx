@@ -55,7 +55,7 @@ void ChargeDivision::ReadPulseShape(std::string PulseFileName)
         unsigned int pulset0Idx = std::distance(PulseValues.begin(), max_value);
     }
     // get the vector of beginning to max of the pulse
-    // check if pulse correction is needed
+    // time response not included!
 }
 
 TVector3 ChargeDivision::DriftDir(TVector3 EntryPoint, TVector3 ExitPoint, float length)
@@ -90,6 +90,11 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
             cout << "Couldn't find particle " << pdgcode << endl;
         };
  
+
+        // GET THE LOCAL POSITION  
+
+        int strip = (detID) % 1024;
+
         double len = ( V[i]->GetEntryPoint() -  V[i]->GetExitPoint()).Mag();
 
         if (fabs(ParticleMass) < 1e-6 || ParticleCharge == 0) {
@@ -106,7 +111,7 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
         Double_t Emean = Etotal / NumberofSegments;  
 
         // check which coordinate to consider
-        Double_t momentum = V[i]->GetPx() * 1000;
+        Double_t momentum = sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)) * 1000;
 
         if (NumberofSegments > 1) {
             for (Int_t j = 0; j < NumberofSegments; j++) {
@@ -114,7 +119,8 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
                 sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen);
                 fluctEnergy.push_back(
                     sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen));
-                driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), segLen*j));
+                driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen*j)/10));
+                
             }
         } else {
             fluctEnergy.push_back(V[i]->GetEnergyLoss() * 1000);
@@ -127,10 +133,10 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
         if (sume > 0.) {
             float rescale_ratio = Etotal / sume;
             for (int m = 0; m < size(fluctEnergy); m++) {
-                fluctEnergy[m] = fluctEnergy[m] * rescale_ratio;
+                fluctEnergy[m] = (fluctEnergy[m] * rescale_ratio)/1000;
             }
         }
-    EnergyFluctUnit ELossVector(fluctEnergy, segLen, driftPos);
+    EnergyFluctUnit ELossVector(fluctEnergy, segLen/10, driftPos);
     return ELossVector;
     }
 }
