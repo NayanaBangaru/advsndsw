@@ -25,7 +25,7 @@ SurfaceSignal ChargeDrift::Drift(EnergyFluctUnit EnergyLossVector)
         DriftDistanceFraction = DriftDistanceFraction < 1. ? DriftDistanceFraction : 1. ;
 
         DriftTime = GetDriftTime(DriftDistance);
-
+        
         // Double_t tn = (module_thickness * module_thickness) / (2 * depletion_voltage * charge_mobility);
         // DriftTime = -tn * log(1 - 2 * depletion_voltage * DriftDistanceFraction / (depletion_voltage + applied_voltage)) + chargedistributionRMS;
 
@@ -73,20 +73,18 @@ Double_t ChargeDrift::GetDriftTime(Double_t distance)
 
     Double_t W = sqrt((2*epsilon*(Nd + Na)*V_0)/(e*Nd*Na));
 
-    Double_t Wn = (Nd * W) / (Nd + Na);
-    Double_t Wp = (Na * W) / (Nd + Na);
+    Double_t Wp = (Nd * W) / (Nd + Na);
+    Double_t Wn = (Na * W) / (Nd + Na);
 
     Int_t num = 80; 
-//*********************************************** */
 
-     
     Double_t x[num] ;
     Double_t y[num] ;
     Double_t E_strip[num] ;
 
-    Double_t x_start = -250e-6 ;
+    Double_t x_start = 250e-6 ;
     Double_t x_end = 0; 
-    // 
+
 
     for (int j = 0; j < num ; j ++ )
     {
@@ -95,23 +93,19 @@ Double_t ChargeDrift::GetDriftTime(Double_t distance)
 
     for (int i = 0; i < num; i++)
     {
-        for (int j = 0; j < num; j++)
+        if ((-Wp <= x[i]) && (x[i] < 0))
         {
-                if ((-Wp <= x[i]) && (x[i] < 0))
-                {
-                    E_strip[i] = -((e*Na*x[i])/epsilon) - ((e*Na*Wp)/epsilon);
-                    
-                }
-                else if ((0 <= x[i]) && (x[i] < Wn))
-                {
-                    E_strip[i] = ((e*Nd*x[i])/epsilon) - ((e*Nd*Wn)/epsilon);
-                }
-                else 
-                {
-                    E_strip[i] = 0;
-                }
+            E_strip[i] = -((e*Na*x[i])/epsilon) - ((e*Na*Wp)/epsilon);
+            
         }
-
+        else if ((0 <= x[i]) && (x[i] < Wn))
+        {
+            E_strip[i] = ((e*Nd*x[i])/epsilon) - ((e*Nd*Wn)/epsilon);
+        }
+        else 
+        {
+            E_strip[i] = 0;
+        }
     }
 
     Double_t dt[num]; 
@@ -120,10 +114,10 @@ Double_t ChargeDrift::GetDriftTime(Double_t distance)
     for(int l = 0; l < num ; l++)
     {
         //tfrac[l] = -x[l]/250e-6; 
-        dt[l] = x[l]/(480*10e-4*E_strip[l]);
+        dt[l] = x[l]/(480*10e-4*E_strip[l]); 
     }
 
     auto gr = new TGraph (num, x, dt);
-    Double_t drifttime = gr->Eval(distance);
-    return -drifttime; 
+    Double_t drifttime = gr->Eval(distance*1e-4);
+    return drifttime; 
 }
