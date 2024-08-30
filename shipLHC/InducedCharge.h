@@ -16,6 +16,8 @@ class InducedCharge
   
   protected:
     Int_t NSigma = 3; 
+    Double_t strip_width = 30e-4; //in cm  
+    Double_t strip_pitch = 120e-4; //in cm 
 
 };
 
