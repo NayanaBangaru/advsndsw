@@ -22,6 +22,11 @@ AdvDigitisation::AdvDigitisation() {}
 void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &V)
 {
 
+    std::vector<Int_t> temp_detID ; //-->need to change this
+    for(int i =0; i < V.size(); i++)
+    {
+        temp_detID.push_back(V[i]->GetDetectorID());
+    }
     ChargeDivision chargedivision{};
     EnergyFluctUnit EnergyLossVector = chargedivision.Divide(detID, V);
 
@@ -30,7 +35,7 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
     SurfaceSignal DiffusionSignal = chargedrift.Drift(EnergyLossVector);
 
     InducedCharge inducedcharge{};
-    inducedcharge.VectoriseStrips(DiffusionSignal);
+    inducedcharge.IntegrateCharge(temp_detID, DiffusionSignal);
 
 
     EFluct = EnergyLossVector.getEfluct();
