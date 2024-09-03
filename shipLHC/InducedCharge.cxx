@@ -41,7 +41,6 @@ AdvSignal InducedCharge::IntegrateCharge(SurfaceSignal DiffusionSignal)
     it = unique(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());  
 
     UniqueAffectedStrips.resize(distance(UniqueAffectedStrips.begin(),it));  
-    cout << amplitude.size() << "\t" << AffectedStrips.size() << "\t" << UniqueAffectedStrips.size() << endl; 
 
     for(int j = 0; j < AffectedStrips.size(); j++)
     {
@@ -53,6 +52,7 @@ AdvSignal InducedCharge::IntegrateCharge(SurfaceSignal DiffusionSignal)
         ChargeDeposited.push_back(integratedcharge*amplitude[j]);        
     }
 
+    Double_t z = accumulate(amplitude.begin(), amplitude.end(), 0);
 
     for (int k = 0; k < UniqueAffectedStrips.size(); k++)
     {
@@ -64,6 +64,15 @@ AdvSignal InducedCharge::IntegrateCharge(SurfaceSignal DiffusionSignal)
         } 
         TotalChargeDeposited.push_back(temp_totalcharge);
     }
+
+    Double_t r = accumulate(TotalChargeDeposited.begin(), TotalChargeDeposited.end(), 0);
+
+    Double_t rescale_ratio = r/z; 
+    for (int k = 0; k < UniqueAffectedStrips.size(); k++)
+    {
+        TotalChargeDeposited[k] = TotalChargeDeposited[k] * rescale_ratio ; 
+    }
+
     AdvSignal ResponseSignal(UniqueAffectedStrips, TotalChargeDeposited); 
     return ResponseSignal; 
 }
@@ -84,6 +93,8 @@ std::vector<Int_t> InducedCharge::GetStrips(std::vector<TVector3> point, std::ve
 
         Int_t N; 
         N = tostrip - fromstrip; 
+
+        //cout << N << "\t" << fromstrip << "\t" << tostrip << "\t" << point[i].X()-(NSigma*area[i]) << "\t" << point[i].X()+(NSigma*area[i]) << endl; 
 
         for (int i = 0 ; i <= N ; i++)
         {

@@ -176,11 +176,13 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
         // GET THE LOCAL POSITION
         TVector3 local_entry_point = getLocal(V[i] -> GetDetectorID(), V[i]->GetEntryPoint());
         TVector3 local_exit_point = getLocal(V[i] -> GetDetectorID(), V[i]->GetExitPoint());
+        cout << local_exit_point.Z() << endl; 
 
 
         int strip = (detID) % 1024;
 
         double len = (local_entry_point - local_exit_point).Mag();
+        cout << "X : " << local_entry_point.X() << "\t" << local_entry_point.Y() << "\t" << local_entry_point.Z() << "\t" << local_exit_point.X() << "\t" << local_exit_point.Y() << "\t" << local_exit_point.Z() << "\t" << len << endl; 
 
         if (fabs(ParticleMass) < 1e-6 || ParticleCharge == 0) {
             NumberofSegments = 1;
@@ -207,13 +209,14 @@ EnergyFluctUnit ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetP
                 // sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen);
                 fluctEnergy.push_back(
                     sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen));
-                driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen * j) / 20));
-                glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen * j) / 20));
+                driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen * j) / 10));
+                cout << "Z :" << driftPos[j].Z() << endl; 
+                glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen * j) / 10));
             }
         } else {
             fluctEnergy.push_back(V[i]->GetEnergyLoss() * 1000);
-            driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen) / 20));
-            glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen) / 20));
+            driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen) / 10));
+            glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen) / 10));
         }
 
         double sume = 0;
