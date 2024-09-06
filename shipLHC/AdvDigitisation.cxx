@@ -39,6 +39,7 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
 
     std::vector<Int_t> Strips = ResponseSignal.getStrips(); 
     std::vector<Double_t> IntegratedSignal = ResponseSignal.getIntegratedSignal();
+    std::vector<std::vector<Double_t>> PulseResponse = ResponseSignal.getPulseResponse();
 
     EFluct = EnergyLossVector.getEfluct();
     segLen = EnergyLossVector.getsegLen();
@@ -87,7 +88,11 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
     myfile2.open("test2.txt", std::ios_base::app);
     for (int j = 0; j < Strips.size(); j ++)
         {
-            myfile2 << V.size() << "\t" << temp_eloss[0] << "\t" << temp_eloss[0]/(3.61*1e-9) << "\t" << Strips[j] << "\t" << IntegratedSignal[j] << "\t" << local_entry.X() << "\t" << local_entry.Z() << "\t" << local_exit.X() << "\t" << local_exit.Z() << endl; 
+            for(int k = 0; k < PulseResponse[j].size(); k++)
+            {
+                myfile2 << V.size() << "\t" << temp_eloss[0] << "\t" << temp_eloss[0]/(3.61*1e-9) << "\t" << Strips[j] << "\t" << IntegratedSignal[j] << "\t" << local_entry.X() << "\t" << local_entry.Z() << "\t" << local_exit.X() << "\t" << local_exit.Z() << "\t" << PulseResponse[j][k] << endl; 
+        
+            }
         }
     myfile.close();
     myfile2.close();
