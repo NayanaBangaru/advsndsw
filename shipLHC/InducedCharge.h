@@ -12,7 +12,7 @@ class InducedCharge
 {
   public:
     InducedCharge();
-    AdvSignal IntegrateCharge(SurfaceSignal DiffusionSignal);
+    std::vector<AdvSignal> IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal);
     std::vector<Int_t> GetStrips(TVector3 point, Double_t area);
     std::vector<std::vector<Double_t>> GetPulseShape(std::string PulseFileName, std::vector<Double_t> ChargeDeposited);
   
