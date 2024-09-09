@@ -168,8 +168,6 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
     std::vector<std::vector<Double_t>> PulseResponse; 
     std::vector<Double_t> temp_response ;
     Double_t response_value; 
-    ofstream myfile;
-    myfile.open("test3.txt", std::ios_base::app);
 
     for(int i = 0; i < ChargeDeposited.size(); i++)
     {
@@ -179,15 +177,12 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
         for(int j = 0; j < PulseValues.size(); j++)
         {  
             response_value = (PulseValues[j] * amplitude_max > stripsensor::saturation_charge_limit ? stripsensor::saturation_charge_limit : PulseValues[j] * amplitude_max);
-            temp_response.push_back(response_value);
-            
-            myfile << temp_response[j]<< "\t" << amplitude_max << endl;  
+
+            temp_response.push_back(response_value * stripsensor::amplificaton_factor);
         }
 
         PulseResponse.push_back(temp_response);
     } 
-    myfile.close();
-
     return PulseResponse; 
     // get the vector of beginning to max of the pulse
     // time response not included!

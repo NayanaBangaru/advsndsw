@@ -10,6 +10,7 @@ const bool peakmode = 0;
 const std::string APVpeakpulse = "data/APVShapePeak_default.txt";
 const std::string APVdecopulse = "data/APVShapeDeco_default.txt";
 const Double_t saturation_charge_limit = 48e-16;
+const Double_t amplificaton_factor = 1/(30000 * 1.6 * 10e-19);
 
 namespace drift{
     const bool cms_approximation = 0; // 
