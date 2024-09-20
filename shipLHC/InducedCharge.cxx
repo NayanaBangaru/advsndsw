@@ -14,6 +14,7 @@
 #include <numeric>
 #include <sstream>
 #include <filesystem>
+#include <random>
 
 using namespace std; 
 
@@ -161,11 +162,15 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
     {
          
         Double_t amplitude_max = ChargeDeposited[i]; 
+
+        std::default_random_engine generator;
+        std::normal_distribution<double> dist(stripsensor::noise_mean, stripsensor::noise_std_dev);
+
         for(int j = 0; j < PulseValues.size(); j++)
         {  
             response_value = ((stripsensor::baseline + (PulseValues[j] * amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (PulseValues[j] * amplitude_max * stripsensor::amplificaton_factor)));
 
-            temp_response.push_back(response_value);
+            temp_response.push_back(response_value + dist(generator));
         }
 
         PulseResponse.push_back(temp_response);

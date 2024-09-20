@@ -16,6 +16,9 @@ const Double_t rail = 4; // in mA
 const Double_t baseline = 2; // in mA 
 const Double_t threshold = 2.5; // in mA
 
+const Double_t noise_mean = 0; 
+const Double_t noise_std_dev = 0.01; 
+
 
 
 namespace drift{
