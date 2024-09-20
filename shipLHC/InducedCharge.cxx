@@ -121,7 +121,6 @@ std::vector<Int_t> InducedCharge::GetStrips(TVector3 point, Double_t area)
 std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string PulseFileName, std::vector<Double_t> ChargeDeposited)
 {
     std::vector<double> PulseValues;
-    cout << "FILENAME : " << PulseFileName << endl; 
     bool APVPeakMode = true;   // to be included in header configuration file
 
     //cout << std::filesystem::exists("data/APVShapeDeco_default.txt") << endl;
@@ -166,12 +165,11 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
     {
          
         Double_t amplitude_max = ChargeDeposited[i]; 
-        cout << amplitude_max << endl;
         for(int j = 0; j < PulseValues.size(); j++)
         {  
-            response_value = (PulseValues[j] * amplitude_max > stripsensor::saturation_charge_limit ? stripsensor::saturation_charge_limit : PulseValues[j] * amplitude_max);
+            response_value = ((stripsensor::baseline + (PulseValues[j] * amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (PulseValues[j] * amplitude_max * stripsensor::amplificaton_factor)));
 
-            temp_response.push_back(response_value * stripsensor::amplificaton_factor);
+            temp_response.push_back(response_value);
         }
 
         PulseResponse.push_back(temp_response);

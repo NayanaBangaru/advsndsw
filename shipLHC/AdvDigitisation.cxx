@@ -95,6 +95,7 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
         std::vector<TVector3> glob_DriftPos;
 
         EFluct = EnergyLossVector[i].getEfluct();
+        EFluctSize = EFluct.size();
         segLen = EnergyLossVector[i].getsegLen();
         DriftPos = EnergyLossVector[i].getDriftPos();
         glob_DriftPos = EnergyLossVector[i].getglobDriftPos();
@@ -105,6 +106,14 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
         DiffArea = DiffusionSignal[i].getDiffusionArea();
         DiffPos = DiffusionSignal[i].getSurfacePos();
 
+        std::vector<Int_t> Strips; 
+        std::vector<Double_t> IntegratedSignal;
+        std::vector<std::vector<Double_t>> PulseResponse;
+
+        Strips = ResponseSignal[i].getStrips(); 
+        IntegratedSignal = ResponseSignal[i].getIntegratedSignal();
+        PulseResponse = ResponseSignal[i].getPulseResponse();
+
         
         
         for (int j = 0; j < EFluct.size(); j++)
@@ -113,11 +122,20 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
 
             chargedriftfile << V.size() << "\t" << V[i]->GetEnergyLoss() << "\t" << V[i]->GetEventID() << "\t" << V[i]->GetTrackID() << "\t" << V[i]->GetTime() << "\t" << V[i]->GetDetectorID() << "\t" << DiffArea[j] << "\t" << DiffPos[j].X() << "\t" << DiffPos[j].Y() << "\t" << DiffPos[j].Z() << endl; 
         }
+
+        for (int l = 0; l < Strips.size(); l++)
+        {
+            for (int m = 0; m < PulseResponse[l].size(); m++)
+            {
+            inducedchargefile << V.size() << "\t" << V[i]->GetEnergyLoss() << "\t" << V[i]->GetEventID() << "\t" << V[i]->GetTrackID() << "\t" << V[i]->GetTime() << "\t" << V[i]->GetDetectorID() << "\t" << Strips[l] << "\t" << IntegratedSignal[l] << "\t" << PulseResponse[l][m] << endl; 
+            }
+        }
     }
 
     rawdatafile.close();
     chargedivisionfile.close();
     chargedriftfile.close();
+    inducedchargefile.close();
 
 
 
