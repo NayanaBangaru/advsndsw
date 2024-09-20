@@ -121,41 +121,37 @@ std::vector<Int_t> InducedCharge::GetStrips(TVector3 point, Double_t area)
 std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string PulseFileName, std::vector<Double_t> ChargeDeposited)
 {
     std::vector<double> PulseValues;
-    bool APVPeakMode = true;   // to be included in header configuration file
 
-    //cout << std::filesystem::exists("data/APVShapeDeco_default.txt") << endl;
-    if (APVPeakMode == true) {
-        std::ifstream inputFile("APVShapeDeco_default.txt");
+    std::ifstream inputFile(PulseFileName);
 
-        if (!inputFile.is_open()) {
-            std::cout << "Error opening the file!" << std::endl;
-        }
-        std::string line;
-        std::string res_find = "resolution:";
-        float res;
-        std::string s;
+    if (!inputFile.is_open()) {
+        std::cout << "Error opening the file!" << std::endl;
+    }
+    std::string line;
+    std::string res_find = "resolution:";
+    float res;
+    std::string s;
 
-        while (getline(inputFile, line)) {
-            if ((!line.empty()) && (line.substr(0, 1) != "#")) {
-                std::stringstream ss(line);
-                if (line.find(res_find) != std::string::npos) {
-                    res = stof(line.substr(line.find(res_find) + res_find.length()));   // implement check for
-                                                                                        // resolution
-                } else {
-                    std::string value;
-                    while (getline(ss, value, ' ')) {
-                        PulseValues.push_back(stod(value));
-                    }
+    while (getline(inputFile, line)) {
+        if ((!line.empty()) && (line.substr(0, 1) != "#")) {
+            std::stringstream ss(line);
+            if (line.find(res_find) != std::string::npos) {
+                res = stof(line.substr(line.find(res_find) + res_find.length()));   // implement check for
+                                                                                    // resolution
+            } else {
+                std::string value;
+                while (getline(ss, value, ' ')) {
+                    PulseValues.push_back(stod(value));
                 }
             }
         }
-        const auto max_value = max_element(PulseValues.begin(), PulseValues.end());
-        if (abs(*max_value - 1) > numeric_limits<double>::epsilon()) {
-            throw invalid_argument("Maximum value of pulse shape not 1.");
-        }
-
-        unsigned int pulset0Idx = std::distance(PulseValues.begin(), max_value);
     }
+    const auto max_value = max_element(PulseValues.begin(), PulseValues.end());
+    if (abs(*max_value - 1) > numeric_limits<double>::epsilon()) {
+        throw invalid_argument("Maximum value of pulse shape not 1.");
+    }
+
+    unsigned int pulset0Idx = std::distance(PulseValues.begin(), max_value);
 
     std::vector<std::vector<Double_t>> PulseResponse; 
     std::vector<Double_t> temp_response ;

@@ -6,11 +6,11 @@
 
 namespace stripsensor {
 
-const bool peakmode = 0;
-const std::string APVpeakpulse = "data/APVShapePeak_default.txt";
-const std::string APVdecopulse = "data/APVShapeDeco_default.txt";
+const bool peakmode = 1;
+const std::string APVpeakpulse = "advsndsw/shipLHC/data/APVShapePeak_default.txt";
+const std::string APVdecopulse = "advsndsw/shipLHC/data/APVShapeDeco_default.txt";
 
-const Double_t value_per_mip = 2; // in mA
+const Double_t value_per_mip = 1; // in mA
 const Double_t amplificaton_factor = value_per_mip/(30000 * 1.6 * 10e-19); // output in mA 
 const Double_t rail = 4; // in mA 
 const Double_t baseline = 2; // in mA 
