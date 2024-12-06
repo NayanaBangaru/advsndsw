@@ -167,7 +167,7 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
         std::normal_distribution<double> dist(stripsensor::noise_mean, stripsensor::noise_std_dev);
         response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)));
         temp_response.push_back(response_value + dist(generator));
-         PulseResponse.push_back(temp_response);
+        PulseResponse.push_back(temp_response);
         //  if (stripsensor::peakmode == 1)
         // {
         //     response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)));
