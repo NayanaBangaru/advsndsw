@@ -11,6 +11,8 @@ class FrontedDriver
   public:
     FrontedDriver();
     void ADCConversion(std::vector<AdvSignal> ResponseSignal);
+  private:
+    std::vector<Double_t> ADCcount;
 
 };
 

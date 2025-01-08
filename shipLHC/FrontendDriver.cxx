@@ -1,4 +1,5 @@
 #include "FrontendDriver.h"
+#include "SiDigiParameters.h"
 
 #include <iostream>
 #include <vector>
@@ -12,8 +13,11 @@ void FrontedDriver::ADCConversion(std::vector<AdvSignal> ResponseSignal)
 {
     for (int k = 0; k < ResponseSignal.size(); k++)
     {
-        std::vector<Double_t> charge = ResponseSignal[k].getIntegratedSignal();
-        cout << charge[0] << endl; 
+        std::vector<Double_t> NumberofElectrons = ResponseSignal[k].getIntegratedSignal();
+        for (int i = 0; i < NumberofElectrons.size(); i++)
+        {
+            ADCcount.push_back(std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC));
+        }
 
     }
     
