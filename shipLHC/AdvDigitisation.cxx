@@ -4,6 +4,7 @@
 #include "ChargeDrift.h"
 #include "InducedCharge.h"
 #include "FrontendDriver.h"
+#include "Clustering.h"
 #include "EnergyFluctUnit.h"
 #include "SurfaceSignal.h"
 #include "AdvSignal.h"
@@ -45,7 +46,10 @@ void AdvDigitisation::digirun(Int_t detID, const std::vector<AdvTargetPoint *> &
     // timeinducedchargefile << inducedtimer.RealTime() << endl;
 
     FrontedDriver frontenddriver{};
-    frontenddriver.ADCConversion(ResponseSignal);
+    std::vector<AdvSignal> FEDResponse = frontenddriver.ADCConversion(ResponseSignal);
+
+    Clustering clustering{};
+    clustering.FindClusters(FEDResponse);
 
     if (stripsensor::frontend::write_digi_to_text)
     {

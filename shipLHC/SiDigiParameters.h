@@ -53,6 +53,7 @@ namespace frontend{
     const Double_t gain = 0.1; // in uA. Need to check which value to use
     const bool write_digi_to_text = 1; 
     const Int_t ElectronperADC = 250; 
+    const Int_t StripNoise = 5; 
 }
 }   // namespace advsnd
 

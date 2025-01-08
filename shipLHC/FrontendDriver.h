@@ -10,9 +10,10 @@ class FrontedDriver
 {
   public:
     FrontedDriver();
-    void ADCConversion(std::vector<AdvSignal> ResponseSignal);
+    std::vector<AdvSignal> ADCConversion(std::vector<AdvSignal> ResponseSignal);
   private:
     std::vector<Double_t> ADCcount;
+    std::vector<AdvSignal> FEDResponse;
 
 };
 
