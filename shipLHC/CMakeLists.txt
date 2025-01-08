@@ -53,6 +53,7 @@ sndRecoTrack.cxx
 ChargeDivision.cxx
 ChargeDrift.cxx
 InducedCharge.cxx
+FrontendDriver.cxx
 SiG4UniversalFluctuation.cxx
 AdvDigitisation.cxx
 )
