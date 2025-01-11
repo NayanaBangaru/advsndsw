@@ -33,7 +33,7 @@ std::vector<AdvSignal> InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>
         std::vector<Int_t> temp_AffectedStrips; 
         std::vector<Double_t> ChargeDeposited; 
         std::vector<Double_t> TotalChargeDeposited;
-        std::vector<Double_t> CoupledChargeDeposit;
+        //AdvSignal CoupledChargeDeposit;
         std::vector<std::vector<Double_t>> PulseResponse; 
 
         Int_t N ;
@@ -92,10 +92,12 @@ std::vector<AdvSignal> InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>
             // TotalChargeDeposited[k] = (TotalChargeDeposited[k] * rescale_ratio)*e ; 
         }
 
-        CoupledChargeDeposit = Coupling(TotalChargeDeposited, UniqueAffectedStrips);
+
         PulseResponse = stripsensor::peakmode ? GetPulseShape(stripsensor::APVpeakpulse, TotalChargeDeposited): GetPulseShape(stripsensor::APVdecopulse, TotalChargeDeposited) ;
-        AdvSignal PulseSignal(UniqueAffectedStrips, TotalChargeDeposited, PulseResponse); 
-        ResponseSignal.push_back(PulseSignal); 
+
+        AdvSignal CoupledChargeDeposit = Coupling(TotalChargeDeposited, UniqueAffectedStrips, PulseResponse);
+        
+        ResponseSignal.push_back(CoupledChargeDeposit); 
     }
     return ResponseSignal;
 }
@@ -191,8 +193,9 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
     // time response not included!
 }
 
-std::vector<Double_t> InducedCharge::Coupling(std::vector<Double_t> TotalCharge, std::vector<Int_t> AffectedStrips)
+AdvSignal InducedCharge::Coupling(std::vector<Double_t> TotalCharge, std::vector<Int_t> AffectedStrips, std::vector<std::vector<Double_t>> PulseResponse)
 {
+    std::vector<AdvSignal> CC;
     Int_t couplingsize = stripsensor::inducedcharge::CouplingConstants.size();
     std::vector<Double_t> CoupledCharge; 
     if (TotalCharge.size()!=1)
@@ -225,6 +228,6 @@ std::vector<Double_t> InducedCharge::Coupling(std::vector<Double_t> TotalCharge,
 
         }
     }
-    return CoupledCharge;
-
+    AdvSignal Coupledresult(AffectedStrips, CoupledCharge, PulseResponse);
+    return Coupledresult; 
 }
