@@ -8,9 +8,9 @@
 using namespace std;
 
 
-FrontedDriver::FrontedDriver() {}
+FrontendDriver::FrontendDriver() {}
 
-std::vector<AdvSignal> FrontedDriver::ADCConversion(std::vector<AdvSignal> ResponseSignal)
+std::vector<AdvSignal> FrontendDriver::ADCConversion(std::vector<AdvSignal> ResponseSignal)
 {
     for (int k = 0; k < ResponseSignal.size(); k++)
     {
@@ -27,7 +27,7 @@ std::vector<AdvSignal> FrontedDriver::ADCConversion(std::vector<AdvSignal> Respo
     return FEDResponse; 
 }
 
-void FrontedDriver::ZeroSuppressionAlgorithms(Int_t mode, AdvSignal Signal)
+void FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
 {
     std::vector<Double_t> Amplitude = Signal.getIntegratedSignal(); 
     std::vector<Int_t> Strips = Signal.getStrips();
@@ -38,7 +38,7 @@ void FrontedDriver::ZeroSuppressionAlgorithms(Int_t mode, AdvSignal Signal)
     std::vector<Int_t> temp_ClusterStrips; 
     std::vector<Double_t> temp_ClusterAmplitudes;
 
-    Int_t count = 0; 
+    Int_t mode = stripsensor::frontend::ZeroSuppressionMode; 
 
     switch (mode) {
         case 1:
@@ -61,17 +61,51 @@ void FrontedDriver::ZeroSuppressionAlgorithms(Int_t mode, AdvSignal Signal)
                     temp_ClusterAmplitudes.push_back(Amplitude[i]); 
                 }
             } 
-            if (ClusterStrips.size() == 1) 
+            if (temp_ClusterStrips.size() == 1) 
             {
                 if (temp_ClusterStrips[0] > 5*stripsensor::frontend::StripNoise){ClusterStrips = temp_ClusterStrips; ClusterAmplitudes = temp_ClusterAmplitudes;}
-                else {ClusterStrips = temp_ClusterStrips; ClusterAmplitudes[0] = 0;}
+                else {ClusterStrips = temp_ClusterStrips; ClusterAmplitudes.push_back(0);}
             }
+            else {ClusterStrips = temp_ClusterStrips; ClusterAmplitudes = temp_ClusterAmplitudes;}
+            for (int i = 0; i < ClusterAmplitudes.size(); i++)
+            {
+                cout << ClusterStrips[i] << "\t" << ClusterAmplitudes[i] << endl; 
+            } 
             break; 
         case 3:
-            cout << "Case 3" << endl; 
+            for (int i = 0; i < Amplitude.size(); i++)
+            {
+                if (Amplitude[i] > 3*stripsensor::frontend::StripNoise)
+                {
+                    temp_ClusterStrips.push_back(Strips[i]); 
+                    temp_ClusterAmplitudes.push_back(Amplitude[i]); 
+                }
+            } 
+            if (temp_ClusterStrips.size() == 1) 
+            {
+                if (temp_ClusterStrips[0] > 5*stripsensor::frontend::StripNoise){ClusterStrips = temp_ClusterStrips; ClusterAmplitudes = temp_ClusterAmplitudes;}
+                else {ClusterStrips = temp_ClusterStrips; ClusterAmplitudes.push_back(0);}
+            }
+            else {ClusterStrips = temp_ClusterStrips; ClusterAmplitudes = temp_ClusterAmplitudes;}
+            for (int i = 0; i < ClusterAmplitudes.size(); i++)
+            {
+                cout << ClusterStrips[i] << "\t" << ClusterAmplitudes[i] << endl; 
+            }  
             break; 
         case 4:
             cout << "Case 4" << endl; 
             break; 
     }
+}
+
+void TestingAlgorithm()
+{
+    std::vector<Int_t> Strips = {100, 101}; 
+    std::vector<Double_t> IntegratedSignal = {50, 60};
+    
+    AdvSignal TestSignal(Strips, IntegratedSignal); 
+
+    FrontendDriver frontenddriver;
+    frontenddriver.ZeroSuppressionAlgorithms(TestSignal);
+
 }
