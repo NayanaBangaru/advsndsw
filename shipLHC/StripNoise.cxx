@@ -3,6 +3,9 @@
 #include "AdvSignal.h"
 #include "TRandom.h"
 
+#include <gsl/gsl_sf_erf.h>
+#include <gsl/gsl_sf_result.h>
+
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -18,8 +21,7 @@ AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
     Int_t StripsSize = Strips.size();
     std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
 
-    gRandom->SetSeed(0);
-    TRandom* rndm = static_cast<TRandom*>(gRandom->Clone());
+    TRandom* rndm = gRandom;
     for (int i = 0; i < StripsSize; i++)
     {
         Double_t x = rndm->Gaus(0, stripsensor::frontend::NoiseRMS);
@@ -27,6 +29,78 @@ AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
     }
     AdvSignal NoiseSignal(Strips, Amplitude); 
     return NoiseSignal; 
+}
+
+void StripNoise::AddGaussianTailNoise(AdvSignal Signal)
+{
+    std::vector<Int_t> Strips = Signal.getStrips();
+    Int_t StripsSize = Strips.size();
+    std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
+
+    std::vector<Double_t> NoisyStrips; 
+    std::vector<Double_t> NoisyAmplitudes; 
+
+    gsl_sf_result result;
+    int status = gsl_sf_erf_Q_e(stripsensor::frontend::NoiseSigmaThreshold, &result);
+
+    float probabilityLeft = result.val;
+
+    Double_t MeanNumberofNoisyChannels = probabilityLeft * StripsSize; 
+
+    TRandom* rndm = gRandom;
+    Double_t NumberofNoisyChannels = rndm->Poisson(MeanNumberofNoisyChannels);
+
+    for (int i = 0; i < NumberofNoisyChannels; i++)
+    {
+        NoisyStrips.push_back(rndm->Integer(stripsensor::frontend::NumberofStrips));
+        NoisyAmplitudes.push_back(generate_gaussian_tail(stripsensor::frontend::NoiseSigmaThreshold*stripsensor::frontend::NoiseRMS, stripsensor::frontend::NoiseRMS)); 
+    }
+}
+
+
+double StripNoise::generate_gaussian_tail(const double a,const double sigma) 
+{
+  /* Returns a gaussian random variable larger than a
+   * This implementation does one-sided upper-tailed deviates.
+   */
+    TRandom* rndm = gRandom;
+    double s = a / sigma;
+    cout << s << endl; 
+
+    if (s < 1) {
+        /*
+        For small s, use a direct rejection method. The limit s < 1
+        can be adjusted to optimise the overall efficiency
+        */
+        double x;
+
+        do {
+        x = rndm->Gaus(0., 1.0);
+        cout << x << endl; 
+        } while (x < s);
+        return x * sigma;
+
+    } else {
+        /* Use the "supertail" deviates from the last two steps
+        * of Marsaglia's rectangle-wedge-tail method, as described
+        * in Knuth, v2, 3rd ed, pp 123-128.  (See also exercise 11, p139,
+        * and the solution, p586.)
+        */
+
+        double u, v, x;
+
+        do {
+        u = rndm->Rndm();
+        cout << u << endl; 
+        do {
+            v = rndm->Rndm();
+            cout << v << endl; 
+        } while (v == 0.0);
+        x = sqrt(s * s - 2 * log(v));
+        cout << "2 : " << x << endl; 
+        } while (x * u > s);
+        return x * sigma;
+    }
 }
 
 void TestingGaussianNoise()
@@ -37,5 +111,6 @@ void TestingGaussianNoise()
     AdvSignal TestSignal(Strips, IntegratedSignal); 
 
     StripNoise stripnoise; 
-    stripnoise.AddGaussianNoise(TestSignal);
+    // stripnoise.AddGaussianNoise(TestSignal);
+    stripnoise.AddGaussianTailNoise(TestSignal);
 }
