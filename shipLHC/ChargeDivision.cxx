@@ -46,7 +46,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-using namespace std;
 
 /*Class for division of energy deposited along particle track in each module. 
 
@@ -131,7 +130,7 @@ std::vector<EnergyFluctUnit> ChargeDivision::Divide(Int_t detID, const std::vect
             ParticleMass = (TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Mass()) * 1000; // in MeV
             ParticleCharge = TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Charge(); 
         } else {
-            cout << "Could not find particle " << pdgcode << " , assuming pion mass and charge." << endl;
+            std::cout << "Could not find particle " << pdgcode << " , assuming pion mass and charge." << std::endl;
             ParticleMass = 139.57; 
             ParticleCharge = 1; 
 

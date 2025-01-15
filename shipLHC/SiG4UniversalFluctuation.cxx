@@ -1,4 +1,6 @@
-//
+//Taken from GEANT4 class G4UniversalFluctuation with some modifications
+
+
 // ********************************************************************
 // * License and Disclaimer                                           *
 // *                                                                  *
