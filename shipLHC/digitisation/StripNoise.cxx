@@ -119,15 +119,3 @@ double StripNoise::generate_gaussian_tail(const double a,const double sigma)
         return x * sigma;
     }
 }
-
-void TestingGaussianNoise()
-{
-    std::vector<Int_t> Strips = {100, 101, 102}; 
-    std::vector<Double_t> IntegratedSignal = {200, 600, 50};
-    
-    AdvSignal TestSignal(Strips, IntegratedSignal); 
-
-    StripNoise stripnoise; 
-    // stripnoise.AddGaussianNoise(TestSignal);
-    stripnoise.AddGaussianTailNoise(TestSignal);
-}
