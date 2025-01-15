@@ -60,16 +60,6 @@ using namespace std;
 SiG4UniversalFluctuation::SiG4UniversalFluctuation() { rndmarray = new Double_t[sizearray]; }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-// void SiG4UniversalFluctuation::InitialiseMe(Int_t pdgcode)
-// {
-//     particleMass = TDatabasePDG::Instance()->GetParticle(pdgcode)->Mass();
-//     q = TDatabasePDG::Instance()->GetParticle(pdgcode)->Charge();
-
-//     m_Inv_particleMass = 1.0 / particleMass;
-//     m_massrate = ShipUnit::electron_mass_c2 * m_Inv_particleMass;
-//     chargeSquare = q * q;
-// }
-
 SiG4UniversalFluctuation::~SiG4UniversalFluctuation() { delete[] rndmarray; }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
