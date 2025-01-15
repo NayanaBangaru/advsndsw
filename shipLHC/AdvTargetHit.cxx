@@ -50,7 +50,6 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V)
     {
         fStrips.push_back(fTest[j].getStrips());
         fCharge.push_back(fTest[j].getIntegratedSignal());
-        cout << fStrips.size() << endl; 
 
     }
 
