@@ -31,14 +31,17 @@ AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
     return NoiseSignal; 
 }
 
-void StripNoise::AddGaussianTailNoise(AdvSignal Signal)
+AdvSignal StripNoise::AddGaussianTailNoise(AdvSignal Signal)
 {
     std::vector<Int_t> Strips = Signal.getStrips();
     Int_t StripsSize = Strips.size();
     std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
 
-    std::vector<Double_t> NoisyStrips; 
+    std::vector<Int_t> NoisyStrips; 
     std::vector<Double_t> NoisyAmplitudes; 
+
+    std::vector<Int_t> NoiseAddedStrips = Strips;  
+    std::vector<Double_t> NoiseAddedAmplitudes = Amplitude; 
 
     gsl_sf_result result;
     int status = gsl_sf_erf_Q_e(stripsensor::frontend::NoiseSigmaThreshold, &result);
@@ -52,9 +55,23 @@ void StripNoise::AddGaussianTailNoise(AdvSignal Signal)
 
     for (int i = 0; i < NumberofNoisyChannels; i++)
     {
+        //need to check if it matches the advsignal strip channels
         NoisyStrips.push_back(rndm->Integer(stripsensor::frontend::NumberofStrips));
         NoisyAmplitudes.push_back(generate_gaussian_tail(stripsensor::frontend::NoiseSigmaThreshold*stripsensor::frontend::NoiseRMS, stripsensor::frontend::NoiseRMS)); 
     }
+
+    for (int j = 0; j < StripsSize; j++)
+    {
+        Amplitude[j] += rndm->Gaus(0, stripsensor::frontend::NoiseRMS);
+    }
+
+    NoiseAddedStrips.insert(NoisyStrips.end(), NoisyStrips.begin(), NoisyStrips.end());
+    NoiseAddedAmplitudes.insert(NoisyAmplitudes.end(), NoisyAmplitudes.begin(), NoisyAmplitudes.end());
+
+    AdvSignal NoiseSignal(NoiseAddedStrips, NoiseAddedAmplitudes);
+
+    return NoiseSignal;
+
 }
 
 
