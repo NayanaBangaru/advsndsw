@@ -1,11 +1,8 @@
 #ifndef SHIPLHC_ADVDIGITISATION_H_
 #define SHIPLHC_ADVDIGITISATION_H_
 
-#include "AdvTargetPoint.h"
 #include "AdvSignal.h"
-#include "TVector3.h"
-#include "TGeoNavigator.h"
-
+#include "AdvTargetPoint.h"
 #include "FairGeoBuilder.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
@@ -27,6 +24,7 @@
 #include "TGeoManager.h"
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
+#include "TGeoNavigator.h"
 #include "TGeoSphere.h"
 #include "TGeoTrd1.h"
 #include "TGeoTrd2.h"
@@ -41,13 +39,10 @@
 #include <vector>
 using namespace std;
 
-
-
 class AdvDigitisation
 {
   public:
     AdvDigitisation();
     std::vector<AdvSignal> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V);
-    
 };
 #endif

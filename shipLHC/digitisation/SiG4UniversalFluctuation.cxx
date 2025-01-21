@@ -1,5 +1,4 @@
-//Taken from GEANT4 class G4UniversalFluctuation with some modifications
-
+// Taken from GEANT4 class G4UniversalFluctuation with some modifications
 
 // ********************************************************************
 // * License and Disclaimer                                           *
@@ -51,10 +50,10 @@
 #include "TF1.h"
 #include "TMath.h"
 #include "TRandom.h"
-#include <fstream>
 
 #include <SiG4UniversalFluctuation.h>
 #include <TDatabasePDG.h>
+#include <fstream>
 #include <iostream>
 using namespace std;
 
@@ -136,10 +135,9 @@ Double_t SiG4UniversalFluctuation::SampleFluctuations(Double_t particleMass,
             energyLoss = meanLoss * r / neff;
         }
         return energyLoss;
-
     }
     if (tcut <= e0) {
-        return meanLoss; 
+        return meanLoss;
     }
 
     const Double_t scaling = std::min(1. + 0.5 * ShipUnit::keV / tcut, 1.50);
@@ -215,21 +213,23 @@ Double_t SiG4UniversalFluctuation::SampleGlandz()
                 if (nnb > sizearray) {
                     sizearray = nnb;
                     delete[] rndmarray;
-                    rndmarray = new Double_t[nnb];                   
+                    rndmarray = new Double_t[nnb];
                 }
                 for (Int_t k = 0; k < nnb; ++k) {
                     // check if this loop is needed to handle the NaN values
-                    if(rndmarray[k]!=rndmarray[k]){loss += w3 / (1. - w * 1e-310);}
-                    else{loss += w3 / (1. - w * rndmarray[k]);}
+                    if (rndmarray[k] != rndmarray[k]) {
+                        loss += w3 / (1. - w * 1e-310);
+                    } else {
+                        loss += w3 / (1. - w * rndmarray[k]);
+                    }
                 }
             }
-        
         }
 
         if (sig2e > 0.0) {
-        SampleGauss(emean, sig2e, loss);
-        // if(loss != loss) {cout << sig2e << endl; }
+            SampleGauss(emean, sig2e, loss);
+            // if(loss != loss) {cout << sig2e << endl; }
         }
     }
-    return loss; 
+    return loss;
 }

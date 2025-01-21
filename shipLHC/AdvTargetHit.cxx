@@ -1,20 +1,21 @@
 #include "AdvTargetHit.h"
+
 #include "AdvTargetPoint.h"
-#include "digitisation/AdvDigitisation.h"
 #include "FairLogger.h"
 #include "TGeoBBox.h"
 #include "TGeoManager.h"
 #include "TGeoNavigator.h"
 #include "TROOT.h"
 #include "TRandom.h"
-#include "TVector3.h"
 #include "TStopwatch.h"
+#include "TVector3.h"
+#include "digitisation/AdvDigitisation.h"
 
 #include <TDatabasePDG.h>
 #include <iomanip>
-#include <typeinfo>
 #include <iostream>
 #include <string>
+#include <typeinfo>
 using std::cout;
 using std::endl;
 
@@ -42,16 +43,14 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V)
     : SndlhcHit(detID)
 {
     AdvDigitisation advdigi{};
-    std::vector<AdvSignal> fTest; 
+    std::vector<AdvSignal> fTest;
     fTest = advdigi.digirunoutput(detID, V);
     flag = true;
-    
-    for (Int_t j = 0; j < fTest.size(); j++)
-    {
+
+    for (Int_t j = 0; j < fTest.size(); j++) {
         fStrips.push_back(fTest[j].getStrips());
         fCharge.push_back(fTest[j].getIntegratedSignal());
-        cout << fStrips.size() << endl; 
-
+        cout << fStrips.size() << endl;
     }
 
     for (Int_t i = 0; i < 16; i++) {

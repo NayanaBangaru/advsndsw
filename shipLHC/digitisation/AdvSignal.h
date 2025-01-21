@@ -15,7 +15,7 @@ class AdvSignal
     }
 
     std::vector<Int_t> getStrips() const { return Strips_; }
-    std::vector<Double_t> getIntegratedSignal() const { return IntegratedSignal_; }  
+    std::vector<Double_t> getIntegratedSignal() const { return IntegratedSignal_; }
 
     void setStrips(std::vector<Int_t> value) { Strips_ = value; }
     void setIntegratedSignal(std::vector<Double_t> value) { IntegratedSignal_ = value; }

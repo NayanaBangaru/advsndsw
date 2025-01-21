@@ -19,8 +19,9 @@
 #define SiG4UniversalFluctuation_h
 
 #include "TRandom.h"
+
 #include <fstream>
-using namespace std; 
+using namespace std;
 
 namespace CLHEP {
 class HepRandomEngine;
@@ -64,8 +65,6 @@ class SiG4UniversalFluctuation
     Int_t sizearray = 30;
     Double_t* rndmarray = nullptr;
 
-     
-
     // virtual Double_t SampleGlandz();
     inline void AddExcitation(const Double_t ax, const Double_t ex, Double_t& eav, Double_t& eloss, Double_t& esig2);
 
@@ -105,7 +104,7 @@ inline void SiG4UniversalFluctuation::SampleGauss(const Double_t eav, const Doub
         } while (x < 0.0 || x > 2 * eav);
         // Loop checking, 23-Feb-2016, Vladimir Ivanchenko
     }
-    eloss += x; 
+    eloss += x;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

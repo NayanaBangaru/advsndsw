@@ -14,7 +14,7 @@ class ChargeDivision
     ChargeDivision();
     std::vector<EnergyFluctUnit> Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V);
     TVector3 DriftDir(TVector3 EntryPoint, TVector3 ExitPoint, float length);
-    TVector3 getLocal(Int_t detID,TVector3 point);
+    TVector3 getLocal(Int_t detID, TVector3 point);
 
   private:
     std::vector<double> PulseValues;

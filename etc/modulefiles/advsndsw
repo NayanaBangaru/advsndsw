@@ -12,7 +12,7 @@ module load BASE/1.0 \
      \
      \
      \
-    
+
 # Our environment
 setenv EOSSND root://eospublic.cern.ch/
 setenv ADVSNDSW_ROOT $::env(BASEDIR)/advsndsw/$version
@@ -31,4 +31,3 @@ prepend-path PYTHONPATH $::env(ADVSNDSW_ROOT)/python
 append-path PYTHONPATH $::env(ADVSNDSW_ROOT)/shipLHC/scripts
 append-path PYTHONPATH $::env(ADVSNDSW_ROOT)/shipLHC/rawData
 append-path PYTHONPATH $::env(XROOTD_ROOT)/lib/python/site-packages
-

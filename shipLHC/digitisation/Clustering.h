@@ -1,16 +1,15 @@
+#include "AdvSignal.h"
+
 #include <iostream>
 #include <vector>
 
-#include "AdvSignal.h"
-
-
-class Clustering 
+class Clustering
 {
-    public:
-        Clustering();
-        void FindClusters(std::vector<AdvSignal> ResponseSignal);
+  public:
+    Clustering();
+    void FindClusters(std::vector<AdvSignal> ResponseSignal);
 
-    private:
-        std::vector<Double_t> HitPosition; 
-        std::vector<Int_t> ClusterStrips;
+  private:
+    std::vector<Double_t> HitPosition;
+    std::vector<Int_t> ClusterStrips;
 };

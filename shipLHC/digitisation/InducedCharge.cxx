@@ -1,110 +1,108 @@
 #include "InducedCharge.h"
-#include "SurfaceSignal.h"
-#include "TVector3.h"
-#include "TGraph.h"
-#include "TRandom.h"
-#include "SiSensor.h"
+
 #include "AdvSignal.h"
 #include "SiDigiParameters.h"
+#include "SiSensor.h"
+#include "SurfaceSignal.h"
+#include "TGraph.h"
+#include "TRandom.h"
+#include "TVector3.h"
 
-#include <iostream>
-#include <vector>
 #include <cmath>
-#include <fstream>
-#include <numeric>
-#include <sstream>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <numeric>
 #include <random>
+#include <sstream>
+#include <vector>
 
-// Class for calculating the induced charge on the strips 
+// Class for calculating the induced charge on the strips
 
 InducedCharge::InducedCharge() {}
 
 std::vector<AdvSignal> InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal)
-{   
-    std::vector<AdvSignal> ResponseSignal; 
-    for (int k = 0; k < DiffusionSignal.size(); k++)
-    {
-        std::vector<Double_t> amplitude = DiffusionSignal[k].getAmplitude(); 
+{
+    std::vector<AdvSignal> ResponseSignal;
+    for (int k = 0; k < DiffusionSignal.size(); k++) {
+        std::vector<Double_t> amplitude = DiffusionSignal[k].getAmplitude();
         std::vector<TVector3> surfacepos = DiffusionSignal[k].getSurfacePos();
         std::vector<Double_t> diffusionarea = DiffusionSignal[k].getDiffusionArea();
 
         std::vector<Int_t> AffectedStrips;
-        std::vector<Int_t> temp_AffectedStrips; 
-        std::vector<Double_t> ChargeDeposited; 
+        std::vector<Int_t> temp_AffectedStrips;
+        std::vector<Double_t> ChargeDeposited;
         std::vector<Double_t> TotalChargeDeposited;
 
-        Double_t x_start; 
-        Double_t x_end; 
-        Double_t z_start; 
-        Double_t z_end;  
-        Double_t integratedcharge; 
+        Double_t x_start;
+        Double_t x_end;
+        Double_t z_start;
+        Double_t z_end;
+        Double_t integratedcharge;
 
-        Double_t e = 1.6e-19; 
+        Double_t e = 1.6e-19;
 
-        for (int i = 0; i < surfacepos.size(); i++)
-        {
-        //Getting the strips that would see the charge for each energy segment 
+        for (int i = 0; i < surfacepos.size(); i++) {
+            // Getting the strips that would see the charge for each energy segment
 
-        AffectedStrips = GetStrips(surfacepos[i], diffusionarea[i]);   
+            AffectedStrips = GetStrips(surfacepos[i], diffusionarea[i]);
 
-            // Calculating the charge deposited by using the error function with the z position of the concerned strip 
+            // Calculating the charge deposited by using the error function with the z position of the concerned strip
 
-            for(int j = 0; j < AffectedStrips.size(); j++)
-            {
-                x_start = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_width / advsnd::strips) - (stripsensor::inducedcharge::strip_pitch / 2); // check calculation
-                x_end = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_width / advsnd::strips) + (stripsensor::inducedcharge::strip_pitch / 2); // check calculation 
+            for (int j = 0; j < AffectedStrips.size(); j++) {
+                x_start = (AffectedStrips[j] - (advsnd::strips / 2)) * (advsnd::sensor_width / advsnd::strips)
+                          - (stripsensor::inducedcharge::strip_pitch / 2);   // check calculation
+                x_end = (AffectedStrips[j] - (advsnd::strips / 2)) * (advsnd::sensor_width / advsnd::strips)
+                        + (stripsensor::inducedcharge::strip_pitch / 2);   // check calculation
                 z_start = (x_start - surfacepos[i].X()) / diffusionarea[j];
                 z_end = abs(x_end - surfacepos[i].X()) / diffusionarea[j];
                 integratedcharge = (erf((z_end) / TMath::Sqrt2()) / 2) - (erf((z_start) / TMath::Sqrt2()) / 2);
-                //cout << surfacepos[j].X() << "\t" << x_start << "\t" << x_end << "\t" << z_start << "\t" << z_end << "\t" << (x_start - surfacepos[j].X()) << "\t" << diffusionarea[j] << "\t" <<integratedcharge << endl; 
+                // cout << surfacepos[j].X() << "\t" << x_start << "\t" << x_end << "\t" << z_start << "\t" << z_end <<
+                // "\t" << (x_start - surfacepos[j].X()) << "\t" << diffusionarea[j] << "\t" <<integratedcharge << endl;
                 temp_AffectedStrips.push_back(AffectedStrips[j]);
-                ChargeDeposited.push_back(integratedcharge*amplitude[j]);        
+                ChargeDeposited.push_back(integratedcharge * amplitude[j]);
             }
         }
 
-        // Getting the unique strips 
+        // Getting the unique strips
 
-        std::vector<Int_t> UniqueAffectedStrips = temp_AffectedStrips;  
+        std::vector<Int_t> UniqueAffectedStrips = temp_AffectedStrips;
         sort(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());
         std::vector<int>::iterator it;
-        it = unique(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());  
+        it = unique(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());
 
-        UniqueAffectedStrips.resize(distance(UniqueAffectedStrips.begin(),it));  
+        UniqueAffectedStrips.resize(distance(UniqueAffectedStrips.begin(), it));
 
-        // Summing up the charge from each segment for each strip 
+        // Summing up the charge from each segment for each strip
 
         Double_t z = accumulate(amplitude.begin(), amplitude.end(), 0);
 
-        for (int k = 0; k < UniqueAffectedStrips.size(); k++)
-        {
+        for (int k = 0; k < UniqueAffectedStrips.size(); k++) {
             Double_t temp_totalcharge = 0.0;
-            auto it = find(temp_AffectedStrips.begin(), temp_AffectedStrips.end(), UniqueAffectedStrips[k]); 
-            while (it != temp_AffectedStrips.end()) { 
+            auto it = find(temp_AffectedStrips.begin(), temp_AffectedStrips.end(), UniqueAffectedStrips[k]);
+            while (it != temp_AffectedStrips.end()) {
                 temp_totalcharge = temp_totalcharge + ChargeDeposited[it - temp_AffectedStrips.begin()];
-                it = find(it + 1, temp_AffectedStrips.end(), UniqueAffectedStrips[k]); 
-            } 
+                it = find(it + 1, temp_AffectedStrips.end(), UniqueAffectedStrips[k]);
+            }
             TotalChargeDeposited.push_back(temp_totalcharge);
         }
 
         Double_t r = accumulate(TotalChargeDeposited.begin(), TotalChargeDeposited.end(), 0);
 
-        Double_t rescale_ratio = r/z; 
-        for (int k = 0; k < UniqueAffectedStrips.size(); k++)
-        {
-            //the total number of electrons
-            TotalChargeDeposited[k] = std::ceil(TotalChargeDeposited[k] * rescale_ratio) ;
+        Double_t rescale_ratio = r / z;
+        for (int k = 0; k < UniqueAffectedStrips.size(); k++) {
+            // the total number of electrons
+            TotalChargeDeposited[k] = std::ceil(TotalChargeDeposited[k] * rescale_ratio);
         }
 
-        // Add coupling to neighbour strips  
+        // Add coupling to neighbour strips
 
-        if (stripsensor::inducedcharge::Coupling)
-        {
+        if (stripsensor::inducedcharge::Coupling) {
             AdvSignal CoupledChargeDeposit = Coupling(TotalChargeDeposited, UniqueAffectedStrips);
-            ResponseSignal.push_back(CoupledChargeDeposit); 
+            ResponseSignal.push_back(CoupledChargeDeposit);
 
         } else {
-            AdvSignal PulseSignal(UniqueAffectedStrips, TotalChargeDeposited); 
+            AdvSignal PulseSignal(UniqueAffectedStrips, TotalChargeDeposited);
             ResponseSignal.push_back(PulseSignal);
         }
     }
@@ -117,28 +115,32 @@ std::vector<Int_t> InducedCharge::GetStrips(TVector3 point, Double_t area)
 {
     std::vector<Int_t> affectedstrips;
 
-    // Calculating the strips that see a charge in the Nsigma diffusion area 
+    // Calculating the strips that see a charge in the Nsigma diffusion area
 
-    int fromstrip = floor(((point.X()-(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2)); // check calculation 
+    int fromstrip =
+        floor(((point.X() - (stripsensor::inducedcharge::NSigma * area)) / (advsnd::sensor_width / advsnd::strips))
+              + (advsnd::strips / 2));   // check calculation
     fromstrip = std::max(0, fromstrip);
-    fromstrip = std::min(advsnd::strips - 1, fromstrip); 
+    fromstrip = std::min(advsnd::strips - 1, fromstrip);
 
-    int tostrip = floor(((point.X()+(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
+    int tostrip =
+        floor(((point.X() + (stripsensor::inducedcharge::NSigma * area)) / (advsnd::sensor_width / advsnd::strips))
+              + (advsnd::strips / 2));
     tostrip = std::max(0, tostrip);
     tostrip = std::min(advsnd::strips - 1, tostrip);
 
-    Int_t N; 
-    N = tostrip - fromstrip; 
+    Int_t N;
+    N = tostrip - fromstrip;
 
-    for (int i = 0 ; i <= N ; i++)
-    {
+    for (int i = 0; i <= N; i++) {
         affectedstrips.push_back(fromstrip + i);
     }
 
-    return affectedstrips; 
+    return affectedstrips;
 }
 
-std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string PulseFileName, std::vector<Double_t> ChargeDeposited)
+std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string PulseFileName,
+                                                                std::vector<Double_t> ChargeDeposited)
 {
     // For pulse response for time correction, not used currently
 
@@ -173,37 +175,41 @@ std::vector<std::vector<Double_t>> InducedCharge::GetPulseShape(std::string Puls
         throw std::invalid_argument("Maximum value of pulse shape not 1.");
     }
 
-    std::vector<std::vector<Double_t>> PulseResponse; 
-    std::vector<Double_t> temp_response ;
-    Double_t response_value; 
+    std::vector<std::vector<Double_t>> PulseResponse;
+    std::vector<Double_t> temp_response;
+    Double_t response_value;
 
-    Int_t sampling_step = stripsensor::sampling / res; 
+    Int_t sampling_step = stripsensor::sampling / res;
 
-    for(int i = 0; i < ChargeDeposited.size(); i++)
-    {
-        std::vector<Double_t> temp_response ;
-        Double_t amplitude_max = ChargeDeposited[i]; 
+    for (int i = 0; i < ChargeDeposited.size(); i++) {
+        std::vector<Double_t> temp_response;
+        Double_t amplitude_max = ChargeDeposited[i];
 
         std::default_random_engine generator;
         std::normal_distribution<double> dist(stripsensor::noise_mean, stripsensor::noise_std_dev);
-        response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)));
+        response_value =
+            ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail
+                 ? stripsensor::rail
+                 : (stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)));
         temp_response.push_back(response_value + dist(generator));
         PulseResponse.push_back(temp_response);
         //  if (stripsensor::peakmode == 1)
         // {
-        //     response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)));
-        //     temp_response.push_back(response_value + dist(generator));
+        //     response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) >
+        //     stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max *
+        //     stripsensor::amplificaton_factor))); temp_response.push_back(response_value + dist(generator));
         //     PulseResponse.push_back(temp_response);
         // }
-        // else 
+        // else
         // {
-        //     response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) > stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)));
-        //     temp_response.push_back(response_value + dist(generator));
+        //     response_value = ((stripsensor::baseline + (amplitude_max * stripsensor::amplificaton_factor)) >
+        //     stripsensor::rail ? stripsensor::rail : (stripsensor::baseline + (amplitude_max *
+        //     stripsensor::amplificaton_factor))); temp_response.push_back(response_value + dist(generator));
         //     PulseResponse.push_back(temp_response);
         // }
-    } 
-   
-    return PulseResponse; 
+    }
+
+    return PulseResponse;
     // get the vector of beginning to max of the pulse
     // time response not included!
 }
@@ -212,20 +218,19 @@ AdvSignal InducedCharge::Coupling(std::vector<Double_t> TotalCharge, std::vector
 {
 
     // Using the coupling constants, charge sharing between strips and their neighbours
-    
-    Int_t couplingsize = stripsensor::inducedcharge::CouplingConstants.size();
-    std::vector<Double_t> CoupledCharge; 
-    std::vector<Int_t> AffectedStrips1 = AffectedStrips; 
-    for (int k = 1; k < couplingsize; k++){
-        AffectedStrips.emplace(AffectedStrips.begin(), AffectedStrips[k-1]- k); 
-        AffectedStrips.push_back(AffectedStrips[AffectedStrips.size()-k] + k);
-        TotalCharge.emplace(TotalCharge.begin(), 1); 
-        TotalCharge.push_back(1);
 
+    Int_t couplingsize = stripsensor::inducedcharge::CouplingConstants.size();
+    std::vector<Double_t> CoupledCharge;
+    std::vector<Int_t> AffectedStrips1 = AffectedStrips;
+    for (int k = 1; k < couplingsize; k++) {
+        AffectedStrips.emplace(AffectedStrips.begin(), AffectedStrips[k - 1] - k);
+        AffectedStrips.push_back(AffectedStrips[AffectedStrips.size() - k] + k);
+        TotalCharge.emplace(TotalCharge.begin(), 1);
+        TotalCharge.push_back(1);
     }
-    
-    // CoupledCharge = TotalCharge; 
-    // cout << TotalCharge.size() << endl; 
+
+    // CoupledCharge = TotalCharge;
+    // cout << TotalCharge.size() << endl;
     // for(int n = 0; n < TotalCharge.size(); n++)
     // {
     //     CoupledCharge[n] = TotalCharge[n]*stripsensor::inducedcharge::CouplingConstants[0];
@@ -234,9 +239,9 @@ AdvSignal InducedCharge::Coupling(std::vector<Double_t> TotalCharge, std::vector
     // for (int i = 0; i < TotalCharge.size(); i++)
     // {
     //     if (TotalCharge[i] == 0)
-    //         continue; 
-    //     cout << "i : " << i << endl; 
-    //     cout << "couplingsize : " << couplingsize << endl; 
+    //         continue;
+    //     cout << "i : " << i << endl;
+    //     cout << "couplingsize : " << couplingsize << endl;
     //     cout << "coupledchargesize : " << CoupledCharge.size() << endl ;
     //     for (int j = 1; j < couplingsize; j++)
     //     {
@@ -245,21 +250,20 @@ AdvSignal InducedCharge::Coupling(std::vector<Double_t> TotalCharge, std::vector
     //         CoupledCharge[i+j] += TotalCharge[i]*stripsensor::inducedcharge::CouplingConstants[j];
     //         cout << i+j << endl;
     //     }
-        
 
     // }
 
     // for (int k = 0; k < CoupledCharge.size(); k++)
     // {
-    //     cout << CoupledCharge[k] << endl; 
+    //     cout << CoupledCharge[k] << endl;
     // }
 
     // for (int k = 0; k < TotalCharge.size(); k++)
     // {
-    //     cout << TotalCharge[k] << endl; 
+    //     cout << TotalCharge[k] << endl;
     // }
 
-    //AdvSignal Coupledresult(AffectedStrips, CoupledCharge, PulseResponse);
+    // AdvSignal Coupledresult(AffectedStrips, CoupledCharge, PulseResponse);
     AdvSignal Coupledresult(AffectedStrips, TotalCharge);
-    return Coupledresult; 
+    return Coupledresult;
 }

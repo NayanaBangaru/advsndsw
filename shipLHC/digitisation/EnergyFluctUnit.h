@@ -8,7 +8,10 @@
 class EnergyFluctUnit
 {
   public:
-    EnergyFluctUnit(std::vector<Double_t> Efluct, float segLen, std::vector<TVector3> DriftPos, std::vector<TVector3> glob_DriftPos)
+    EnergyFluctUnit(std::vector<Double_t> Efluct,
+                    float segLen,
+                    std::vector<TVector3> DriftPos,
+                    std::vector<TVector3> glob_DriftPos)
         : Efluct_(Efluct)
         , segLen_(segLen)
         , DriftPos_(DriftPos)
@@ -20,7 +23,6 @@ class EnergyFluctUnit
     float getsegLen() const { return segLen_; }
     std::vector<TVector3> getDriftPos() const { return DriftPos_; }
     std::vector<TVector3> getglobDriftPos() const { return glob_DriftPos_; }
-    
 
     void setEfluct(std::vector<Double_t> value) { Efluct_ = value; }
     void setsegLen(float value) { segLen_ = value; }

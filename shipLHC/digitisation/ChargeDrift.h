@@ -15,16 +15,15 @@ class ChargeDrift
     Double_t GetDriftTime(Double_t distance);
 
   protected:
-    std::vector<TVector3> DriftPos; 
-    std::vector<Double_t> EnergyFluct; 
-    Double_t DriftDistance; 
+    std::vector<TVector3> DriftPos;
+    std::vector<Double_t> EnergyFluct;
+    Double_t DriftDistance;
     Double_t DriftDistanceFraction;
-    Double_t DriftTime; 
-    TVector3 DriftPositiononSurface; 
+    Double_t DriftTime;
+    TVector3 DriftPositiononSurface;
     Double_t DiffusionArea;
     Double_t DiffusionConstant;
-    Double_t Amplitude; 
-
+    Double_t Amplitude;
 };
 
 #endif   // SHIPLHC_CHARGEDRIFT_H_

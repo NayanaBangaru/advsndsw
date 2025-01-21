@@ -18,7 +18,6 @@ class FrontendDriver
   private:
     std::vector<Double_t> ADCcount;
     std::vector<AdvSignal> FEDResponse;
-
 };
 
-#endif  
+#endif
