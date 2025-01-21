@@ -27,6 +27,8 @@ class AdvTargetHit : public SndlhcHit
     void Print() const;
     bool isValid() const { return flag; }
     bool isMasked(Int_t i) const { return fMasked[i]; }
+    std::vector<std::vector<Int_t>> GetAffectedStrips() const { return fStrips; }
+    std::vector<std::vector<Double_t>> GetADC() const { return fCharge; }
     void SetMasked(Int_t i) { fMasked[i] = kTRUE; }
     int constexpr GetStation() { return fDetectorID >> 17; }
     int constexpr GetPlane() { return (fDetectorID >> 16) % 2; }   // 0 is X-plane, 1 is Y-pane
