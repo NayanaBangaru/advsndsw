@@ -46,6 +46,18 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
     InducedCharge inducedcharge{};
     AdvSignal ResponseSignal = inducedcharge.IntegrateCharge(DiffusionSignal);
 
+    // Int_t num = 0;
+    // for (int i = 0; i < V.size(); i ++)
+    // {
+    //     //cout << V[i]->GetEnergyLoss() << "\t" << V[i]->PdgCode() << "\t" << sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)) << "\t" << ResponseSignal.getStrips()[k] << "\t" << ResponseSignal.getIntegratedSignal()[k] << endl ;
+    //     if ((V[i]->PdgCode() == 13) && (sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)) > 80))
+    //     {
+    //         // cout << sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)) << endl; 
+    //         num = 1; 
+    //     }
+    
+    // }
+
     //FED Response 
     FrontendDriver frontenddriver{};
     AdvSignal FEDResponseSignal = frontenddriver.FEDResponse(ResponseSignal);
@@ -59,8 +71,57 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
         if (x>0){return (int)x;}
         else {return 0;}
         });
+    // if (num == 1)
+    // {
+    //     plotclustersize(Strips);
+    //     cout << V.size() << "\t" << sqrt(pow(V[0]->GetPx(), 2) + pow(V[0]->GetPy(), 2) + pow(V[0]->GetPz(), 2)) << endl; 
+    // }
+    
+    plotstrips(ADC); 
+
     DigitisedHit["Strips"] = Strips; 
     DigitisedHit["ADC"] = ADC; 
     
     return DigitisedHit;
 }
+
+void AdvDigitisation::plotclustersize(std::vector<Int_t> Strips)
+{
+    ofstream rawdatafile;
+    rawdatafile.open("to_plot.txt", std::ios_base::app);
+    rawdatafile << Strips.size() << endl; 
+    rawdatafile.close();
+}
+
+void AdvDigitisation::plotZSevent()
+{
+    ofstream rawdatafile;
+    rawdatafile.open("to_plot.txt", std::ios_base::app);
+    std::vector<Int_t> Strips = {665, 666, 667, 668, 669, 670, 671, 672, 673, 674, 675, 676, 677};
+    std::vector<Double_t> Charge = {36, 75, 83, 82, 82, 89, 88, 88, 82, 90, 89, 74, 7};
+    AdvSignal testsignal(Strips, Charge);
+    
+    FrontendDriver frontenddriver{};
+    AdvSignal testresponse = frontenddriver.FEDResponse(testsignal);
+
+    for (int k = 0; k < (testresponse.getStrips()).size(); k++)
+    {
+        rawdatafile << testresponse.getStrips()[k] << "\t" << testresponse.getIntegratedSignal()[k] << endl; 
+    }
+    
+    rawdatafile.close();
+}
+
+void AdvDigitisation::plotstrips(std::vector<Int_t> Charge)
+{
+    ofstream rawdatafile;
+    rawdatafile.open("to_plot.txt", std::ios_base::app);
+    for (int i = 0; i < Charge.size(); i++)
+    {
+        rawdatafile << Charge[i] << endl; 
+    }
+    
+    rawdatafile.close();
+}
+
+

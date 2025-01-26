@@ -48,5 +48,9 @@ class AdvDigitisation
   public:
     AdvDigitisation();
     std::map<std::string, std::vector<Int_t>> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V);    
+
+    void plotclustersize(std::vector<Int_t> Strips); 
+    void plotZSevent();
+    void plotstrips(std::vector<Int_t> Charge);
 };
 #endif

@@ -26,7 +26,7 @@ AdvSignal FrontendDriver::FEDResponse(AdvSignal Signal)
     
     if (stripsensor::frontend::ZSModeOption && stripsensor::frontend::NoiseOption)
     {
-        FEDResponseSignal = stripnoise.AddGaussianTailNoise(Signal); 
+        FEDResponseSignal = stripnoise.AddGaussianTailNoise(Signal);  
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
         FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
@@ -38,6 +38,7 @@ AdvSignal FrontendDriver::FEDResponse(AdvSignal Signal)
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
     }
+    FEDResponseSignal = SaturateRange(FEDResponseSignal);
     return FEDResponseSignal;
 }
 
@@ -61,7 +62,7 @@ AdvSignal FrontendDriver::SaturateRange(AdvSignal Signal)
     {
         if (stripsensor::frontend::ZSModeOption)
         {
-            if (Charge[i] == 1023)
+            if (Charge[i] > 1022)
             {
                 Charge[i] = 255; 
             }
@@ -69,10 +70,19 @@ AdvSignal FrontendDriver::SaturateRange(AdvSignal Signal)
             {
                 Charge[i] = 254; 
             }
+            if (Charge[i] < 0)
+            {
+                Charge[i] = 0; 
+            }
+
         } else {
             if (Charge[i] > 1023)
             {
                 Charge[i] = 1023; 
+            }
+            if (Charge[i] < 0)
+            {
+                Charge[i] = 0; 
             }
         }
     }
@@ -97,7 +107,7 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
         case 1:
             for (int i = 0; i < Amplitude.size(); i++)
             {
-                if (Amplitude[i] > stripsensor::frontend::ZeroSuppressionMode1T)
+                if (Amplitude[i] > stripsensor::frontend::ZeroSuppressionMode1T*stripsensor::frontend::StripNoise)
                 {
                     ClusterStrips.push_back(Strips[i]);
                     ClusterAmplitudes.push_back(Amplitude[i]);
@@ -135,10 +145,12 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
                     temp_ClusterAmplitudes.push_back(Amplitude[i]); 
                 }
             } 
+            ClusterStrips = temp_ClusterStrips; 
+            ClusterAmplitudes = temp_ClusterAmplitudes; 
 
             for (int j = 0; j < temp_ClusterStrips.size(); j++)
             {
-                if(std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]+1)!=temp_ClusterStrips.end()) 
+                if((std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]+1)!=temp_ClusterStrips.end()) && (std::find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[j]+1)==ClusterStrips.end())) 
                 {
                     auto it = std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]+1 );
                     if ((temp_ClusterAmplitudes[it - temp_ClusterStrips.begin()])>0)
@@ -148,7 +160,7 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
                     }
 
                 } 
-                if(std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]-1)!=temp_ClusterStrips.end()) 
+                if((std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]-1)!=temp_ClusterStrips.end()) && (std::find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[j]-1)==ClusterStrips.end()))
                 {
                     auto itlower = std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]-1);
                     if ((temp_ClusterAmplitudes[itlower - temp_ClusterStrips.begin()])>0)
@@ -228,4 +240,32 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
     }
     AdvSignal ClusterSignal(ClusterStrips, ClusterAmplitudes); 
     return ClusterSignal; 
+}
+
+void Testing()
+{
+    ofstream rawdatafile;
+    rawdatafile.open("to_plot.txt", std::ios_base::app);
+    std::vector<Int_t> Strips = {665, 666, 667, 668, 669, 670, 671, 672, 673, 674, 675, 676, 677};
+    std::vector<Double_t> Charge = {36, 75, 83, 82, 82, 89, 88, 88, 82, 90, 89, 74, 7};
+    AdvSignal testsignal(Strips, Charge);
+    
+    FrontendDriver frontenddriver{};
+    AdvSignal testresponse = frontenddriver.FEDResponse(testsignal);
+    std::vector<Double_t> Charge1 = testresponse.getIntegratedSignal();
+    //std::vector<Int_t> Strips = FEDResponseSignal.getStrips();
+    std::vector<Int_t> ADC(Charge.size()); 
+
+    std::transform(Charge1.begin(), Charge1.end(), ADC.begin(), [](Double_t x) { 
+        if (x>0){return (int)x;}
+        else {return 0;}
+        });
+
+    for (int k = 0; k < (testresponse.getStrips()).size(); k++)
+    {
+        rawdatafile << testresponse.getStrips()[k] << "\t" << ADC[k] << endl; 
+        cout << testresponse.getStrips()[k] << "\t" << ADC[k] << endl; 
+    }
+    
+    rawdatafile.close();
 }
