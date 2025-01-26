@@ -20,8 +20,8 @@
 
 InducedCharge::InducedCharge() {}
 
-AdvSignal InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal)
-{   
+void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal, AdvSignal TotalSignal)
+{    
     std::vector<AdvSignal> ResponseSignal; 
     for (int k = 0; k < DiffusionSignal.size(); k++)
     {
@@ -70,18 +70,18 @@ AdvSignal InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSig
         std::vector<AdvSignal> temp_Signalvector;
         AdvSignal temp_signal(temp_AffectedStrips, ChargeDeposited); 
         temp_Signalvector.push_back(temp_signal);
-        AdvSignal TotalSignal = Combine(temp_Signalvector);
+        AdvSignal TotalSignalUnscale = Combine(temp_Signalvector);
 
 
-        TotalChargeDeposited = TotalSignal.getIntegratedSignal();
-        UniqueAffectedStrips = TotalSignal.getStrips();
+        TotalChargeDeposited = TotalSignalUnscale.getIntegratedSignal();
+        UniqueAffectedStrips = TotalSignalUnscale.getStrips();
 
         Double_t r = accumulate(TotalChargeDeposited.begin(), TotalChargeDeposited.end(), 0);
         Double_t rescale_ratio = r/z; 
         for (int m = 0; m < UniqueAffectedStrips.size(); m++)
         {
             //the total number of electrons
-            TotalChargeDeposited[m] = std::ceil((TotalChargeDeposited[m]/stripsensor::frontend::ElectronperADC) * rescale_ratio) ;
+            TotalChargeDeposited[m] = std::ceil((TotalChargeDeposited[m]) * rescale_ratio) ;
         }
         // Add coupling to neighbour strips  
 
@@ -95,8 +95,7 @@ AdvSignal InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSig
             ResponseSignal.push_back(PulseSignal);
         }
     }
-    AdvSignal TotalSignal = Combine(ResponseSignal);
-    return TotalSignal;
+    TotalSignal = Combine(ResponseSignal);
 }
 
 AdvSignal InducedCharge::Combine(std::vector<AdvSignal> Signal)
@@ -258,8 +257,8 @@ AdvSignal InducedCharge::Coupling(std::vector<Double_t> TotalCharge, std::vector
             continue; 
         for (int j = 1; j < couplingsize; j++)
         {
-            CoupledCharge[i-j] += TotalCharge[i]*stripsensor::inducedcharge::CouplingConstants[j];
-            CoupledCharge[i+j] += TotalCharge[i]*stripsensor::inducedcharge::CouplingConstants[j];
+            CoupledCharge[i-j] += TotalCharge[i]*stripsensor::inducedcharge::CouplingConstants[j]*0.5;
+            CoupledCharge[i+j] += TotalCharge[i]*stripsensor::inducedcharge::CouplingConstants[j]*0.5;
         }
         
 

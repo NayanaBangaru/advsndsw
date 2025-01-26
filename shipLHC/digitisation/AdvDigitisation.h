@@ -2,6 +2,8 @@
 #define SHIPLHC_ADVDIGITISATION_H_
 
 #include "AdvTargetPoint.h"
+#include "EnergyFluctUnit.h"
+#include "SurfaceSignal.h"
 #include "AdvSignal.h"
 #include "TVector3.h"
 #include "TGeoNavigator.h"
@@ -47,6 +49,16 @@ class AdvDigitisation
 {
   public:
     AdvDigitisation();
-    std::map<std::string, std::vector<Int_t>> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V);    
+    std::map<std::string, std::vector<Int_t>> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal TotalSignal, AdvSignal FEDResponseSignal);    
+    TVector3 getLocal(Int_t detID, TVector3 global_pos);
+
+    void write_to_root(const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal ResponseSignal, AdvSignal FEDResponseSignal);
+    void dEdx(const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit> EnergyLossVector, Int_t pc, Double_t mom);
+    void stripcharge(std::vector<Int_t> ADC);
+    void numberofstrips(const std::vector<AdvTargetPoint *> &V, std::vector<Int_t> Strips, Int_t pc, Double_t mom);
+    void clustercharge(std::vector<Int_t> ADC);
+    void eta(std::vector<Int_t> ADC, std::vector<Int_t> Strips);
+    void diffusionarea(std::vector<SurfaceSignal> DiffusionSignal);
+
 };
 #endif

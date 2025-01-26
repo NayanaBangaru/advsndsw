@@ -43,8 +43,8 @@ namespace inducedcharge{
     const Int_t NSigma = 3; 
     const Double_t strip_width = 30e-4; //in cm  
     const Double_t strip_pitch = 120e-4; //in cm 
-    const bool Coupling = 0; 
-    const std::vector<Double_t> CouplingConstants = {0.964, 0.018};
+    const bool Coupling = 1; 
+    const std::vector<Double_t> CouplingConstants = {0.98, 0.02};
 }
 
 namespace frontend{
@@ -52,12 +52,12 @@ namespace frontend{
     const Double_t reference_current = 0.128; // in mA, above which is the gain 
     // const bool peakmode = 0; // 0 for peak mode operation of the APV, 1 for deconvolution mode 
     const Double_t gain = 0.1; // in uA. Need to check which value to use
-    const bool write_digi_to_text = 1; 
+    const bool write_digi_to_text = 0; 
     const Int_t ElectronperADC = 250; 
     const bool NoiseOption = 1; 
     const bool CMNoiseOption = 0;
-    const bool ZSModeOption = 0; 
-    const Int_t StripNoise = 1; 
+    const bool ZSModeOption = 1; 
+    const Int_t StripNoise = 4; 
     const Double_t NoiseRMS = 2; 
     const Double_t NoiseSigmaThreshold = 2; 
     const Double_t CMNoise = 2; 

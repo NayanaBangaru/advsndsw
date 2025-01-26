@@ -29,6 +29,8 @@
 #include <algorithm>   // std::sort
 #include <iostream>    // for operator<<, basic_ostream, endl
 #include <vector>      // std::vector
+#include <TNtuple.h>
+#include "digitisation/AdvSignal.h"
 
 using namespace std;
 
@@ -138,7 +140,25 @@ InitStatus DigiTaskSND::Init()
     ioman->Register("Digi_AdvTargetHits2MCPoints", "DigiAdvTargetHits2MCPoints_det", AdvTargetHits2MCPoints, kTRUE);
     AdvTargetHits2MCPoints->BypassStreamer(kTRUE);
 
+
+    ofile = new TFile("example.root", "RECREATE");
+
+    tree = new TTree("tree", "Example Tree");
+    // FEDResponseSignal = new AdvSignal();
+    tree->Branch("test", &size);
+    tree->Branch("test2", &FEDResponseSignal);
+
+    //dat = new TNtuple("ntuple", "Example TNtuple", "AdvTargetPoint_Size:y:z");
+
     return kSUCCESS;
+}
+
+void DigiTaskSND::Finish()
+{
+    ofile->Write(); 
+    ofile->Close();
+    delete ofile;
+
 }
 
 void DigiTaskSND::Exec(Option_t* /*opt*/)
@@ -232,13 +252,16 @@ void DigiTaskSND::digitiseAdvTarget()
 
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID sensor + strip)
-        new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points);
+        new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points, dat, FEDResponseSignal);
+        size = (FEDResponseSignal.getStrips()).size();
+        tree->Fill();
         auto point_map = mc_points[detector_id];
         for (const auto& [point_id, energy_loss] : point_map) {
             mc_links.Add(detector_id, point_id, energy_loss / norm[detector_id]);
         }
     }
     new ((*AdvTargetHits2MCPoints)[0]) Hit2MCPoints(mc_links);
+    
 }
 
 void DigiTaskSND::digitiseAdvMuFilter()

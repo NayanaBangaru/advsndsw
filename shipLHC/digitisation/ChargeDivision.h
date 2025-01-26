@@ -12,7 +12,7 @@ class ChargeDivision
 {
   public:
     ChargeDivision();
-    std::vector<EnergyFluctUnit> Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V);
+    void Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> ELossVector);
     TVector3 DriftDir(TVector3 EntryPoint, TVector3 ExitPoint, float length);
     TVector3 getLocal(Int_t detID,TVector3 point);
 

@@ -11,7 +11,7 @@ class ChargeDrift
 {
   public:
     ChargeDrift();
-    std::vector<SurfaceSignal> Drift(std::vector<EnergyFluctUnit> EnergyLossVector);
+    void Drift(std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DuffusionSignal);
     Double_t GetDriftTime(Double_t distance);
 
   protected:
