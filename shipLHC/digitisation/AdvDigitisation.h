@@ -48,9 +48,14 @@ class AdvDigitisation
   public:
     AdvDigitisation();
     std::map<std::string, std::vector<Int_t>> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V);    
+    TVector3 getLocal(Int_t detID, TVector3 global_pos);
 
     void plotclustersize(std::vector<Int_t> Strips); 
     void plotZSevent();
     void plotstrips(std::vector<Int_t> Charge);
+    void plotsaturationdetails(const std::vector<AdvTargetPoint *> &V, std::vector<Int_t> ADC, AdvSignal ResponseSignal);
+    void plotclustercharge(AdvSignal ResponseSignal);
+    void write_to_root( std::vector<AdvTargetPoint *> &V);
+    //void plotefluct(const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit> EnergyLossVector);
 };
 #endif

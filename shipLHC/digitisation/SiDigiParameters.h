@@ -52,7 +52,7 @@ namespace frontend{
     const Double_t reference_current = 0.128; // in mA, above which is the gain 
     // const bool peakmode = 0; // 0 for peak mode operation of the APV, 1 for deconvolution mode 
     const Double_t gain = 0.1; // in uA. Need to check which value to use
-    const bool write_digi_to_text = 1; 
+    const bool write_digi_to_text = 0; 
     const Int_t ElectronperADC = 250; 
     const bool NoiseOption = 1; 
     const bool CMNoiseOption = 0;
