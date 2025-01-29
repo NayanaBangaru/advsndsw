@@ -9,29 +9,29 @@ class SurfaceSignal
 {
   public:
     SurfaceSignal()
-        : DiffusionArea_(), SurfacePos_(), Amplitude_()
+        : fDiffusionArea(), fSurfacePos(), fAmplitude()
     {
     }
 
     SurfaceSignal(std::vector<Double_t> DiffusionArea, std::vector<TVector3> SurfacePos, std::vector<Double_t> Amplitude)
-        : DiffusionArea_(DiffusionArea)
-        , SurfacePos_(SurfacePos)
-        , Amplitude_(Amplitude)
+        : fDiffusionArea(DiffusionArea)
+        , fSurfacePos(SurfacePos)
+        , fAmplitude(Amplitude)
     {
     }
 
-    std::vector<Double_t> getDiffusionArea() const { return DiffusionArea_; }
-    std::vector<TVector3> getSurfacePos() const { return SurfacePos_; }    
-    std::vector<Double_t> getAmplitude() const { return Amplitude_; }    
+    std::vector<Double_t> getDiffusionArea() const { return fDiffusionArea; }
+    std::vector<TVector3> getSurfacePos() const { return fSurfacePos; }    
+    std::vector<Double_t> getAmplitude() const { return fAmplitude; }    
 
-    void setDiffusionArea(std::vector<Double_t> value) { DiffusionArea_ = value; }
-    void setSurfacePos(std::vector<TVector3> value) { SurfacePos_ = value; }
-    void setAmplitude(std::vector<Double_t> value) { Amplitude_ = value; }
+    void setDiffusionArea(std::vector<Double_t> value) { fDiffusionArea = value; }
+    void setSurfacePos(std::vector<TVector3> value) { fSurfacePos = value; }
+    void setAmplitude(std::vector<Double_t> value) { fAmplitude = value; }
 
   private:
-    std::vector<Double_t> DiffusionArea_;
-    std::vector<TVector3> SurfacePos_;
-    std::vector<Double_t> Amplitude_;
+    std::vector<Double_t> fDiffusionArea;
+    std::vector<TVector3> fSurfacePos;
+    std::vector<Double_t> fAmplitude;
 };
 
 #endif

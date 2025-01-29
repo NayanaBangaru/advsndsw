@@ -2,6 +2,8 @@
 #define SHIPLHC_ADVDIGITISATION_H_
 
 #include "AdvTargetPoint.h"
+#include "EnergyFluctUnit.h"
+#include "SurfaceSignal.h"
 #include "AdvSignal.h"
 #include "TVector3.h"
 #include "TGeoNavigator.h"
@@ -55,7 +57,6 @@ class AdvDigitisation
     void plotstrips(std::vector<Int_t> Charge);
     void plotsaturationdetails(const std::vector<AdvTargetPoint *> &V, std::vector<Int_t> ADC, AdvSignal ResponseSignal);
     void plotclustercharge(AdvSignal ResponseSignal);
-    void write_to_root( std::vector<AdvTargetPoint *> &V);
-    //void plotefluct(const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit> EnergyLossVector);
+    void write_to_root(const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit>& EnergyLossVector, std::vector<SurfaceSignal>& DiffusionSignal, AdvSignal& ResponseSignal, AdvSignal& FEDResponseSignal);
 };
 #endif

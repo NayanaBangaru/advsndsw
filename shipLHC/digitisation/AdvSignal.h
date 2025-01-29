@@ -9,25 +9,25 @@ class AdvSignal
 {
   public:
     AdvSignal()
-        : Strips_(), IntegratedSignal_()
+        : fStrips(), fIntegratedSignal()
     {
     }
 
     AdvSignal(std::vector<Int_t> Strips, std::vector<Double_t> IntegratedSignal)
-        : Strips_(Strips)
-        , IntegratedSignal_(IntegratedSignal)
+        : fStrips(Strips)
+        , fIntegratedSignal(IntegratedSignal)
     {
     }
 
-    std::vector<Int_t> getStrips() const { return Strips_; }
-    std::vector<Double_t> getIntegratedSignal() const { return IntegratedSignal_; }  
+    std::vector<Int_t> getStrips() const { return fStrips; }
+    std::vector<Double_t> getIntegratedSignal() const { return fIntegratedSignal; }  
 
-    void setStrips(std::vector<Int_t> value) { Strips_ = value; }
-    void setIntegratedSignal(std::vector<Double_t> value) { IntegratedSignal_ = value; }
+    void setStrips(std::vector<Int_t> value) { fStrips = value; }
+    void setIntegratedSignal(std::vector<Double_t> value) { fIntegratedSignal = value; }
 
   private:
-    std::vector<Int_t> Strips_;
-    std::vector<Double_t> IntegratedSignal_;
+    std::vector<Int_t> fStrips;
+    std::vector<Double_t> fIntegratedSignal;
 };
 
 #endif // SHIPLHC_ADVSIGNAL_H_
