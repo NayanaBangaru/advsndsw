@@ -5,6 +5,8 @@
 #include "FairTask.h"            // for FairTask, InitStatus
 #include "SNDLHCEventHeader.h"   // for EventHeader
 #include "Scifi.h"               // for Scifi detector
+#include "TNtuple.h"
+#include "digitisation/AdvSignal.h"
 
 #include <Rtypes.h>       // for THashConsistencyHolder, ClassDef
 #include <RtypesCore.h>   // for Double_t, Int_t, Option_t
@@ -27,6 +29,8 @@ class DigiTaskSND : public FairTask
 
     /** Virtual method Init **/
     virtual InitStatus Init();
+
+    virtual void Finish();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -63,6 +67,12 @@ class DigiTaskSND : public FairTask
     TClonesArray* fMCTrackArray;
     DigiTaskSND(const DigiTaskSND&);
     DigiTaskSND& operator=(const DigiTaskSND&);
+
+    TNtuple* dat;
+    AdvSignal FEDResponseSignal; 
+    Int_t size; 
+    TTree* tree; 
+    TFile* ofile;
 
     ClassDef(DigiTaskSND, 3);
 };

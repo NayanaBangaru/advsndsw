@@ -34,22 +34,22 @@ using namespace std;
 
 AdvDigitisation::AdvDigitisation() {}
 
-std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t detID, const std::vector<AdvTargetPoint *> &V)
+std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t detID, const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal TotalSignal, AdvSignal FEDResponseSignal)
 {
     // Charge Division
     ChargeDivision chargedivision{};
-    std::vector<EnergyFluctUnit> EnergyLossVector = chargedivision.Divide(detID, V);
+    chargedivision.Divide(detID, V, EnergyLossVector);
 
     //Charge Drift
     ChargeDrift chargedrift{};
-    std::vector<SurfaceSignal> DiffusionSignal = chargedrift.Drift(EnergyLossVector);
+    chargedrift.Drift(EnergyLossVector, DiffusionSignal);
 
     //Induced Charge on strips
     InducedCharge inducedcharge{};
-    AdvSignal ResponseSignal = inducedcharge.IntegrateCharge(DiffusionSignal);
+    inducedcharge.IntegrateCharge(DiffusionSignal, TotalSignal);
 
     FrontendDriver frontenddriver{};
-    AdvSignal FEDResponseSignal = frontenddriver.FEDResponse(ResponseSignal);
+    frontenddriver.FEDResponse(TotalSignal, FEDResponseSignal);
 
     //Creating map of hit 
     std::map<std::string, std::vector<Int_t>> DigitisedHit; 
@@ -62,13 +62,140 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
         });
 
     DigitisedHit["Strips"] = Strips; 
-    DigitisedHit["ADC"] = ADC; 
+    DigitisedHit["ADC"] = ADC;
 
-    write_to_root(V, EnergyLossVector, DiffusionSignal, ResponseSignal, FEDResponseSignal);
-    
+    cout << Strips.size() << endl; 
+
     return DigitisedHit;
 }
 
+void AdvDigitisation::dEdx(const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit> EnergyLossVector, Int_t pc, Double_t mom)
+{
+    ofstream datafile;
+    datafile.open("forplot.txt", std::ios_base::app);
+
+    for (int i = 0; i < V.size(); i++)
+    {
+        if (V[i]->PdgCode() == pc && sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)) < mom)
+        {
+            for (int j = 0; j < (EnergyLossVector[i].getEfluct()).size(); j++)
+            {
+                datafile << (EnergyLossVector[i].getEfluct())[j] / (EnergyLossVector[i].getsegLen()) << "\n";
+            }
+            
+        }
+    }
+    datafile.close();
+}
+
+void AdvDigitisation::stripcharge(std::vector<Int_t> ADC)
+{
+    ofstream datafile;
+    datafile.open("forplot.txt", std::ios_base::app);
+
+    for (int i = 0; i < ADC.size(); i++)
+    {
+        datafile << ADC[i] << "\n";
+    }
+
+    datafile.close();
+}
+
+void AdvDigitisation::numberofstrips(const std::vector<AdvTargetPoint *> &V, std::vector<Int_t> Strips, Int_t pc, Double_t mom)
+{
+    ofstream datafile;
+    datafile.open("forplot.txt", std::ios_base::app);
+    for (int i = 0; i < V.size(); i++)
+    {
+        if (V[i]->PdgCode() == pc && sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)) < mom)
+        {
+            datafile << Strips.size() << "\n";
+            
+        }
+    }
+
+    datafile.close();
+
+}
+
+void AdvDigitisation::clustercharge(std::vector<Int_t> ADC)
+{
+    ofstream datafile;
+    datafile.open("forplot.txt", std::ios_base::app);
+    Double_t sum = 0; 
+
+    if (ADC.size()>0)
+    {
+    for (int i = 0; i < ADC.size(); i++)
+    {
+        sum = sum + ADC[i];
+    }
+
+    datafile << sum << endl; 
+    }
+
+    datafile.close();
+    
+}
+
+
+void AdvDigitisation::eta(std::vector<Int_t> ADC, std::vector<Int_t> Strips)
+{
+    ofstream datafile;
+    datafile.open("forplot.txt", std::ios_base::app);
+    if (ADC.size()>0){
+    Int_t index = distance(ADC.begin(), max_element(ADC.begin(), ADC.end()));
+    Int_t strip_a = Strips[index];
+    Double_t Q_a = ADC[index]; 
+    Double_t Q_b1 ;
+    Double_t Q_b2 ; 
+    Double_t Q_b ; 
+    Double_t etan; 
+    if((std::find(Strips.begin(), Strips.end(), strip_a+1)!=Strips.end())) 
+    {
+        auto it = std::find(Strips.begin(), Strips.end(), strip_a +1);
+        Q_b1 = ADC[it-Strips.begin()];
+    } else {
+        Q_b1 = 0; 
+    }
+    if((std::find(Strips.begin(), Strips.end(), strip_a-1)!=Strips.end())) 
+    {
+        auto it1 = std::find(Strips.begin(), Strips.end(), strip_a -1);
+        Q_b2 = ADC[it1-Strips.begin()];
+
+    } else {
+        Q_b2 = 0; 
+    }   
+    if (Q_b2 > Q_b1)
+    {
+        Q_b = Q_b2;
+        etan = Q_b / (Q_b + Q_a);
+
+    }else{
+        Q_b = Q_b1;
+        etan = Q_a / (Q_b+Q_a);
+    }
+
+    datafile << etan << endl; 
+    }
+
+    datafile.close();
+
+}
+
+void AdvDigitisation::diffusionarea(std::vector<SurfaceSignal> DiffusionSignal)
+{
+    ofstream datafile;
+    datafile.open("forplot.txt", std::ios_base::app);
+    for (int i = 0; i < DiffusionSignal.size(); i++)
+    {
+        for (int j = 0; j < (DiffusionSignal[i].getDiffusionArea()).size(); j++ )
+        {
+        datafile << (DiffusionSignal[i].getDiffusionArea())[j] << "\n";
+        }
+    }
+    datafile.close();
+}
 // void AdvDigitisation::write_to_root(const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal ResponseSignal, AdvSignal FEDResponseSignal) {
     
 //     if (gSystem->AccessPathName("digi.root"))
@@ -77,10 +204,10 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
 //         TTree tree("digis", "Tree with AdvTargetPoint data");
 
 //         AdvTargetPoint* point = nullptr; // Pointer to the full object
-//         EnergyFluctUnit chargedivisionpoint; 
-//         SurfaceSignal chargedriftpoint;
-//         AdvSignal inducedchargepoint;
-//         AdvSignal fedresponsepoint; 
+//         EnergyFluctUnit* chargedivisionpoint; 
+//         SurfaceSignal* chargedriftpoint;
+//         AdvSignal* inducedchargepoint;
+//         AdvSignal* fedresponsepoint; 
 
 
 //         tree.Branch("AdvPoint", &point); // Store the pointer to the full object
@@ -93,10 +220,10 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
 //         for (size_t i = 0; i < V.size(); ++i) {
 //             point = V[i]; // Assign pointer to current AdvTargetPoint
 
-//             chargedivisionpoint = EnergyLossVector[i];
-//             chargedriftpoint = DiffusionSignal[i];
-//             inducedchargepoint = ResponseSignal; 
-//             fedresponsepoint = FEDResponseSignal;
+//             chargedivisionpoint = &EnergyLossVector[i];
+//             chargedriftpoint = &DiffusionSignal[i];
+//             inducedchargepoint = &ResponseSignal; 
+//             fedresponsepoint = &FEDResponseSignal;
 
 //             // Fill the tree
 //             tree.Fill();
@@ -140,53 +267,3 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
 //         ofile->Close();
 //     }
 // }
-
-void AdvDigitisation::write_to_root(const std::vector<AdvTargetPoint*>& V, 
-                                    const std::vector<EnergyFluctUnit>& EnergyLossVector, 
-                                    const std::vector<SurfaceSignal>& DiffusionSignal, 
-                                    const AdvSignal& ResponseSignal, 
-                                    const AdvSignal& FEDResponseSignal) {
-
-    static TFile* ofile = nullptr;
-    static TTree* tree = nullptr;
-
-    if (!ofile) {
-        ofile = TFile::Open("digi.root", "UPDATE");
-        tree = (TTree*)ofile->Get("digis");
-
-        if (!tree) {
-            ofile->Close();  // Close if corrupted
-            ofile = new TFile("digi.root", "RECREATE");
-            tree = new TTree("digis", "Tree with AdvTargetPoint data");
-        }
-
-        tree->SetAutoFlush(50000);
-        ofile->SetCompressionLevel(1);
-    }
-
-    AdvTargetPoint* point = nullptr;
-    EnergyFluctUnit chargedivisionpoint;
-    SurfaceSignal chargedriftpoint;
-    AdvSignal inducedchargepoint;
-    AdvSignal fedresponsepoint;
-
-    tree->Branch("AdvPoint", &point, 32000, 0);
-    tree->Branch("ChargeDivision", &chargedivisionpoint, 32000, 0);
-    tree->Branch("ChargeDrift", &chargedriftpoint, 32000, 0);
-    tree->Branch("InducedCharge", &inducedchargepoint, 32000, 0);
-    tree->Branch("FEDResponse", &fedresponsepoint, 32000, 0);
-
-    for (size_t i = 0; i < V.size(); ++i) {
-        point = V[i];
-        chargedivisionpoint = EnergyLossVector[i];
-        chargedriftpoint = DiffusionSignal[i];
-        inducedchargepoint = ResponseSignal;
-        fedresponsepoint = FEDResponseSignal;
-
-        tree->Fill();
-    }
-
-    tree->AutoSave("FlushBaskets");  // Save only new data
-
-    // Keep the file open to avoid unnecessary overhead
-}

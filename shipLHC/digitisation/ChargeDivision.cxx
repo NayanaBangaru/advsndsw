@@ -113,9 +113,8 @@ TVector3 ChargeDivision::DriftDir(TVector3 EntryPoint, TVector3 ExitPoint, float
     return DriftPos;
 }
 
-std::vector<EnergyFluctUnit> ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V)
+void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> ELossVector)
 {
-    std::vector<EnergyFluctUnit> ELossVector; 
 
     for (int i = 0; i < V.size(); i++) {
 
@@ -192,9 +191,5 @@ std::vector<EnergyFluctUnit> ChargeDivision::Divide(Int_t detID, const std::vect
         EnergyFluctUnit EnergyFluctuations(fluctEnergy, segLen / 10, driftPos, glob_driftPos);
         ELossVector.push_back(EnergyFluctuations);
     }
-
-    // Returns the vector with segments and their energy depositon (in GeV) and position (in cm) 
-
-    return ELossVector; 
 
 }

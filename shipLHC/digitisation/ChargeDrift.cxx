@@ -8,14 +8,15 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+using namespace std; 
 
 // Class for drifting the charge to the surface of the detector and diffusing the charge
 
 ChargeDrift::ChargeDrift() {}
 
-std::vector<SurfaceSignal> ChargeDrift::Drift(std::vector<EnergyFluctUnit> EnergyLossVector)
+void ChargeDrift::Drift(std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal)
 {   
-    std::vector<SurfaceSignal> DiffusionSignal; 
     for (int k = 0; k < EnergyLossVector.size(); k++)
     {
         std::vector<Double_t> diffusionarea; 
@@ -65,7 +66,6 @@ std::vector<SurfaceSignal> ChargeDrift::Drift(std::vector<EnergyFluctUnit> Energ
         
         DiffusionSignal.push_back(Diffused);
     }
-    return DiffusionSignal;
 }
 
 Double_t ChargeDrift::GetDriftTime(Double_t distance)

@@ -5,6 +5,7 @@
 #include "SndlhcHit.h"
 #include "TArrayD.h"
 #include "TVector3.h"
+#include "TNtuple.h"
 #include "digitisation/AdvSignal.h"
 #include <map>
 
@@ -20,7 +21,7 @@ class AdvTargetHit : public SndlhcHit
     explicit AdvTargetHit(Int_t detID);
 
     // Constructor from AdvTargetPoint
-    AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>&);
+    AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, AdvSignal FEDResponseSignal);
 
     /** Destructor **/
     ~AdvTargetHit() = default;

@@ -14,32 +14,34 @@ using namespace std;
 
 FrontendDriver::FrontendDriver() {}
 
-AdvSignal FrontendDriver::FEDResponse(AdvSignal Signal)
+void FrontendDriver::FEDResponse(AdvSignal Signal, AdvSignal FEDResponseSignal)
 {
     AdvSignal ADCResponse = ADCConversion(Signal); 
-
-    AdvSignal FEDResponseSignal ; 
+ 
     std::vector<AdvSignal> temp_FEDResponseSignal;
 
     StripNoise stripnoise{}; 
     InducedCharge inducedcharge{}; 
+    //cout << (Signal.getIntegratedSignal())[0] << endl; 
     
     if (stripsensor::frontend::ZSModeOption && stripsensor::frontend::NoiseOption)
     {
-        FEDResponseSignal = stripnoise.AddGaussianTailNoise(Signal);  
+        FEDResponseSignal = stripnoise.AddGaussianTailNoise(ADCResponse);  
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
+        //cout << (FEDResponseSignal.getIntegratedSignal())[0] << endl;
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
+        //cout << (FEDResponseSignal.getIntegratedSignal())[0] << endl;
         FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
+        //cout << (FEDResponseSignal.getIntegratedSignal())[0] << endl;
     }
     if (!stripsensor::frontend::ZSModeOption)
     {
-        FEDResponseSignal = stripnoise.AddGaussianNoise(Signal);
+        FEDResponseSignal = stripnoise.AddGaussianNoise(ADCResponse);
         FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
     }
     FEDResponseSignal = SaturateRange(FEDResponseSignal);
-    return FEDResponseSignal;
 }
 
 AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
@@ -47,7 +49,7 @@ AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
         std::vector<Double_t> NumberofElectrons = ResponseSignal.getIntegratedSignal();
         for (int i = 0; i < NumberofElectrons.size(); i++)
         {
-            ADCcount.push_back(stripsensor::frontend::StripNoise + std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC));
+            ADCcount.push_back(std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC));
         }
 
         AdvSignal ADCResponse(ResponseSignal.getStrips(), ADCcount);
@@ -141,8 +143,8 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
             {
                 if (Amplitude[i] > 3*stripsensor::frontend::StripNoise)
                 {
-                    temp_ClusterStrips.push_back(Strips[i]); 
-                    temp_ClusterAmplitudes.push_back(Amplitude[i]); 
+                    ClusterStrips.push_back(Strips[i]); 
+                    ClusterAmplitudes.push_back(Amplitude[i]); 
                 }
             } 
             ClusterStrips = temp_ClusterStrips; 
@@ -181,8 +183,8 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
             {
                 if (Amplitude[i] > 3*stripsensor::frontend::StripNoise)
                 {
-                    temp_ClusterStrips.push_back(Strips[i]); 
-                    temp_ClusterAmplitudes.push_back(Amplitude[i]); 
+                    ClusterStrips.push_back(Strips[i]); 
+                    ClusterAmplitudes.push_back(Amplitude[i]); 
                 }
             } 
             Int_t neighbhour = 0 ; 
@@ -251,7 +253,8 @@ void Testing()
     AdvSignal testsignal(Strips, Charge);
     
     FrontendDriver frontenddriver{};
-    AdvSignal testresponse = frontenddriver.FEDResponse(testsignal);
+    AdvSignal testresponse;
+    frontenddriver.FEDResponse(testsignal, testresponse);
     std::vector<Double_t> Charge1 = testresponse.getIntegratedSignal();
     //std::vector<Int_t> Strips = FEDResponseSignal.getStrips();
     std::vector<Int_t> ADC(Charge.size()); 
