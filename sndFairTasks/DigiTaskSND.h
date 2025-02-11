@@ -79,6 +79,7 @@ class DigiTaskSND : public FairTask
     AdvSignal* FEDResponsePoint; 
 
     Int_t event; 
+    Int_t size;
     Int_t eventpoint; 
     AdvTargetPoint* advtargetpoint; 
     EnergyFluctUnit chargedivpoint; 

@@ -44,7 +44,6 @@ AdvTargetHit::AdvTargetHit(Int_t detID)
 AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, std::vector<EnergyFluctUnit>* ChargeDivisionPoint, std::vector<SurfaceSignal>* ChargeDriftPoint, AdvSignal* InducedChargePoint, AdvSignal* FEDResponsePoint)
     : SndlhcHit(detID)
 {
-    std::cout << detID << std::endl; 
     AdvDigitisation advdigi{};
     std::vector<EnergyFluctUnit> EnergyLossVector;
     std::vector<SurfaceSignal> DiffusionSignal; 

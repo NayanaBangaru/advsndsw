@@ -148,6 +148,7 @@ InitStatus DigiTaskSND::Init()
     tree = new TTree("digis", "Digitisation Tree");
     advtargetpoint = nullptr; 
     tree->Branch("fEvent", &eventpoint);
+    tree->Branch("fSize", &size);
     tree->Branch("fAdvTargetPoint", &advtargetpoint);
     tree->Branch("fChargeDivision", &chargedivpoint);
     tree->Branch("fChargeDrift", &chargedriftpoint);
@@ -258,6 +259,7 @@ void DigiTaskSND::digitiseAdvTarget()
     }
     
     event = 0; 
+    size = 0; 
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID sensor + strip)
         ChargeDivisionPoint = new std::vector<EnergyFluctUnit>();
@@ -268,6 +270,7 @@ void DigiTaskSND::digitiseAdvTarget()
         event = event + 1; 
         for (int m = 0; m < ChargeDivisionPoint->size(); m++)
         {
+            size = points.size();
             eventpoint = event; 
             advtargetpoint = points[m];
             chargedivpoint = (*ChargeDivisionPoint)[m]; 
