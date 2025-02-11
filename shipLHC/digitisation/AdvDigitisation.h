@@ -49,7 +49,7 @@ class AdvDigitisation
 {
   public:
     AdvDigitisation();
-    std::map<std::string, std::vector<Int_t>> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal TotalSignal, AdvSignal FEDResponseSignal);    
+    std::map<std::string, std::vector<Int_t>> digirunoutput(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit>& EnergyLossVector, std::vector<SurfaceSignal>& DiffusionSignal, AdvSignal& TotalSignal, AdvSignal& FEDResponseSignal);    
     TVector3 getLocal(Int_t detID, TVector3 global_pos);
 
     void write_to_root(const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal ResponseSignal, AdvSignal FEDResponseSignal);

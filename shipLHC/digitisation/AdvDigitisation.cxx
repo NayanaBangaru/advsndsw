@@ -34,13 +34,13 @@ using namespace std;
 
 AdvDigitisation::AdvDigitisation() {}
 
-std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t detID, const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal, AdvSignal TotalSignal, AdvSignal FEDResponseSignal)
+std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t detID, const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit>& EnergyLossVector, std::vector<SurfaceSignal>& DiffusionSignal, AdvSignal& TotalSignal, AdvSignal& FEDResponseSignal)
 {
     // Charge Division
     ChargeDivision chargedivision{};
     chargedivision.Divide(detID, V, EnergyLossVector);
-
-    //Charge Drift
+     
+    // //Charge Drift
     ChargeDrift chargedrift{};
     chargedrift.Drift(EnergyLossVector, DiffusionSignal);
 
@@ -63,8 +63,6 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
 
     DigitisedHit["Strips"] = Strips; 
     DigitisedHit["ADC"] = ADC;
-
-    cout << Strips.size() << endl; 
 
     return DigitisedHit;
 }

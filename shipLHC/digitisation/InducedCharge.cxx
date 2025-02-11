@@ -20,7 +20,7 @@
 
 InducedCharge::InducedCharge() {}
 
-void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal, AdvSignal TotalSignal)
+void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>& DiffusionSignal, AdvSignal& TotalSignal)
 {    
     std::vector<AdvSignal> ResponseSignal; 
     for (int k = 0; k < DiffusionSignal.size(); k++)
@@ -46,6 +46,10 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal, 
         for (int i = 0; i < surfacepos.size(); i++)
         {
         //Getting the strips that would see the charge for each energy segment 
+        //std::cout << "Diffusion Signal Pos: " << i << "\t" << surfacepos[i][0] << "\t" << surfacepos[i][1] << "\t" << surfacepos[i][2] << std::endl ;
+        //std::cout << "Diffusion Signal Area: " << i << "\t" << diffusionarea[i] << std::endl ;
+        //std::cout << "Diffusion Signal Amplitude: " << i << "\t" << amplitude[i] << std::endl ;
+        
 
         AffectedStrips = GetStrips(surfacepos[i], diffusionarea[i]);   
 
@@ -53,15 +57,22 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal, 
 
             for(int j = 0; j < AffectedStrips.size(); j++)
             {
-                x_start = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_width / advsnd::strips) - (stripsensor::inducedcharge::strip_pitch / 2); // check calculation
-                x_end = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_width / advsnd::strips) + (stripsensor::inducedcharge::strip_pitch / 2); // check calculation 
-                z_start = (x_start - surfacepos[i].X()) / diffusionarea[j];
-                z_end = abs(x_end - surfacepos[i].X()) / diffusionarea[j];
+                 
+                //x_start = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_width / advsnd::strips) - (stripsensor::inducedcharge::strip_pitch / 2); // check calculation
+                //x_end = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_width / advsnd::strips) + (stripsensor::inducedcharge::strip_pitch / 2); // check calculation 
+                x_start = (AffectedStrips[j] * (advsnd::sensor_width/advsnd::strips)) - (advsnd::sensor_width/2);
+                x_end = ((AffectedStrips[j]+1) * (advsnd::sensor_width/advsnd::strips)) - (advsnd::sensor_width/2);
+                
+                z_start = (x_start - surfacepos[i].X()) / diffusionarea[i];
+                z_end = abs(x_end - surfacepos[i].X()) / diffusionarea[i];
                 integratedcharge = (erf((z_end) / TMath::Sqrt2()) / 2) - (erf((z_start) / TMath::Sqrt2()) / 2);
                 temp_AffectedStrips.push_back(AffectedStrips[j]);
-                ChargeDeposited.push_back(integratedcharge*amplitude[j]);        
+                ChargeDeposited.push_back(integratedcharge*amplitude[i]);   
+                //std::cout << "Affected Strips : " << j << "\t" << AffectedStrips[j] << "\t" << diffusionarea[i] << "\t" << surfacepos[i].X() << "\t" << amplitude[i] << "\t" << x_start << "\t" << x_end << "\t" << z_start << "\t" << z_end << "\t" << integratedcharge << "\t" << integratedcharge*amplitude[i] << std::endl;     
+
             }
         }
+
 
         Double_t z = accumulate(amplitude.begin(), amplitude.end(), 0);
 
@@ -77,7 +88,7 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSignal, 
         UniqueAffectedStrips = TotalSignalUnscale.getStrips();
 
         Double_t r = accumulate(TotalChargeDeposited.begin(), TotalChargeDeposited.end(), 0);
-        Double_t rescale_ratio = r/z; 
+        Double_t rescale_ratio = z/r;
         for (int m = 0; m < UniqueAffectedStrips.size(); m++)
         {
             //the total number of electrons
@@ -142,13 +153,17 @@ std::vector<Int_t> InducedCharge::GetStrips(TVector3 point, Double_t area)
 
     // Calculating the strips that see a charge in the Nsigma diffusion area 
 
-    int fromstrip = floor(((point.X()-(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2)); // check calculation 
+    //int fromstrip = floor(((point.X()-(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2)); // check calculation 
+    int fromstrip = floor(((point.X() - (stripsensor::inducedcharge::NSigma*area)) + (advsnd::sensor_width/2))/(advsnd::sensor_width/advsnd::strips));
     fromstrip = std::max(0, fromstrip);
     fromstrip = std::min(advsnd::strips - 1, fromstrip); 
 
-    int tostrip = floor(((point.X()+(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
+    //int tostrip = floor(((point.X()+(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
+    int tostrip = floor(((point.X() + (stripsensor::inducedcharge::NSigma*area)) + (advsnd::sensor_width/2))/(advsnd::sensor_width/advsnd::strips));
     tostrip = std::max(0, tostrip);
     tostrip = std::min(advsnd::strips - 1, tostrip);
+
+    //std::cout << "STRIP CALC : " << point.X() << "\t" << (point.X()-(stripsensor::inducedcharge::NSigma*area)) << "\t" << (point.X() - (stripsensor::inducedcharge::NSigma*area)) + (advsnd::sensor_width/2) << "\t" << (advsnd::sensor_width/advsnd::strips) << "\t" << fromstrip << std::endl; 
 
     Int_t N; 
     N = tostrip - fromstrip; 

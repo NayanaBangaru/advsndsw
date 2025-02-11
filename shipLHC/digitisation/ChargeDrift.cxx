@@ -15,7 +15,7 @@ using namespace std;
 
 ChargeDrift::ChargeDrift() {}
 
-void ChargeDrift::Drift(std::vector<EnergyFluctUnit> EnergyLossVector, std::vector<SurfaceSignal> DiffusionSignal)
+void ChargeDrift::Drift(std::vector<EnergyFluctUnit>& EnergyLossVector, std::vector<SurfaceSignal>& DiffusionSignal)
 {   
     for (int k = 0; k < EnergyLossVector.size(); k++)
     {
@@ -40,7 +40,7 @@ void ChargeDrift::Drift(std::vector<EnergyFluctUnit> EnergyLossVector, std::vect
             
             Double_t tn = (stripsensor::drift::module_thickness * stripsensor::drift::module_thickness) / (2 * stripsensor::drift::depletion_voltage * stripsensor::drift::charge_mobility);
             DriftTime = -tn * log(1 - 2 * stripsensor::drift::depletion_voltage * DriftDistanceFraction / (stripsensor::drift::depletion_voltage + stripsensor::drift::applied_voltage)) + stripsensor::drift::chargedistributionRMS;
-
+            
             //Position of drifted charge on the surface of the detector
 
             DriftPositiononSurface.SetXYZ(DriftPos[i].X(), DriftPos[i].Y(), DriftPos[i].Z()+DriftDistance); 

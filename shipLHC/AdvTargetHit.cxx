@@ -41,39 +41,29 @@ AdvTargetHit::AdvTargetHit(Int_t detID)
 }
 
 // -----   constructor from AdvMuFilterPoint   ------------------------------------------
-AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, AdvSignal FEDResponseSignal)
+AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, std::vector<EnergyFluctUnit>* ChargeDivisionPoint, std::vector<SurfaceSignal>* ChargeDriftPoint, AdvSignal* InducedChargePoint, AdvSignal* FEDResponsePoint)
     : SndlhcHit(detID)
 {
     AdvDigitisation advdigi{};
     std::vector<EnergyFluctUnit> EnergyLossVector;
     std::vector<SurfaceSignal> DiffusionSignal; 
     AdvSignal TotalSignal;
-    
-    //AdvSignal FEDResponseSignal;
+    AdvSignal FEDResponseSignal;
     fDigitisedHit = advdigi.digirunoutput(detID, V, EnergyLossVector, DiffusionSignal, TotalSignal, FEDResponseSignal);
     flag = true;
 
-    std::cout << "yo " << V.size() << std::endl;
-    std::cout << "yo1 " << EnergyLossVector.size() << std::endl;
-    std::cout << "yo2 " << DiffusionSignal.size() << std::endl;
-     
-
-    //std::vector<Int_t> fedresponsepointstrips = fDigitisedHit.getStrips(); 
-    //std::vector<Double_t> fedresponsepointcharge = fDigitisedHit.getIntegratedSignal();
-
-    //int* fedresponsepointstripsarr = (fDigitisedHit.getStrips()).data();
-    // Int_t pointsize = V.size();
-    // std::vector<Float_t> pointmom(pointsize);
-    // //std::vector<Double_t> pointentryx(pointsize);
-    // for (int i = 0; i < pointsize; i++)
+    *ChargeDivisionPoint = EnergyLossVector;
+    *ChargeDriftPoint = DiffusionSignal;  
+    *InducedChargePoint = TotalSignal; 
+    *FEDResponsePoint = FEDResponseSignal;
+    // for(int k =0; k < TotalSignal.getStrips().size(); k++)
     // {
-    //     pointmom[i]  = (sqrt(pow(V[i]->GetPx(), 2) + pow(V[i]->GetPy(), 2) + pow(V[i]->GetPz(), 2)));
-    // } 
-    // std::vector<Float_t> pointmom_float(pointmom.begin(), pointmom.end());  // Convert to Float_t
-    // //dat->Fill(pointmom_float.data());
+    //     if (V.size() == 1)
+    //     {
+    //     std::cout << k << "\t" << TotalSignal.getStrips()[k] << "\t" << EnergyLossVector[0].getDriftPos()[0][0] << "\t" << EnergyLossVector[0].getDriftPos()[0][1] << "\t" << V[0]->GetStation() << "\t" << V[0]->GetPlane() << "\t" << V[0]->GetRow() << "\t" <<  V[0]->GetColumn() << "\t" << V[0]->GetSensor() << "\t" << V[0]->GetModule() << std::endl; 
+    //     }
+    // }
 
-    //dat->Fill(pointmom_float.data(), pointmom_float.data(), pointmom_float.data());
-    // dat->Fill(1, 1, 1);
     for (Int_t i = 0; i < 16; i++) {
         fMasked[i] = kFALSE;
     }

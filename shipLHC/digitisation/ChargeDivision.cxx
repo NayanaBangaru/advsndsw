@@ -108,14 +108,13 @@ TVector3 ChargeDivision::DriftDir(TVector3 EntryPoint, TVector3 ExitPoint, float
     /*Getting the position of the segment by using the length and direction of the particle track*/
 
     TVector3 DriftDirUnit = (EntryPoint - ExitPoint).Unit();
-    TVector3 DriftMul = DriftDirUnit * length;
+    //TVector3 DriftMul = DriftDirUnit * length;
     TVector3 DriftPos = EntryPoint - (DriftDirUnit * length);
     return DriftPos;
 }
 
-void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit> ELossVector)
+void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V, std::vector<EnergyFluctUnit>& ELossVector)
 {
-
     for (int i = 0; i < V.size(); i++) {
 
         std::vector<Double_t> fluctEnergy;
@@ -165,15 +164,14 @@ void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V, 
 
         if (NumberofSegments > 1) {
             for (Int_t j = 0; j < NumberofSegments; j++) {
-                fluctEnergy.push_back(
-                    sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen));
-                driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen * j) / 10));
-                glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen * j) / 10));
+                fluctEnergy.push_back(sig4fluct.SampleFluctuations(ParticleMass, ParticleCharge, Emean, momentum, segLen));
+                driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen * (j+0.5)) / 10));
+                glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen * (j+0.5)) / 10));
             }
         } else {
             fluctEnergy.push_back(V[i]->GetEnergyLoss() * 1000);
-            driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen) / 10));
-            glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen) / 10));
+            driftPos.push_back(DriftDir(local_entry_point, local_exit_point, (segLen*0.5) / 10));
+            glob_driftPos.push_back(DriftDir(V[i]->GetEntryPoint(), V[i]->GetExitPoint(), (segLen*0.5) / 10));
         }
 
         // Scaling each fluctuation accordingly with the total energy loss 
