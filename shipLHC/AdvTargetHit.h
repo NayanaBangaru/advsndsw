@@ -7,6 +7,8 @@
 #include "TVector3.h"
 #include "TNtuple.h"
 #include "digitisation/AdvSignal.h"
+#include "digitisation/EnergyFluctUnit.h"
+#include "digitisation/SurfaceSignal.h"
 #include <map>
 
 class AdvTargetPoint;
@@ -21,7 +23,7 @@ class AdvTargetHit : public SndlhcHit
     explicit AdvTargetHit(Int_t detID);
 
     // Constructor from AdvTargetPoint
-    AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, AdvSignal FEDResponseSignal);
+    AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, std::vector<EnergyFluctUnit>* ChargeDivisionPoint, std::vector<SurfaceSignal>* ChargeDriftPoint, AdvSignal* InducedChargePoint, AdvSignal* FEDResponsePoint);
 
     /** Destructor **/
     ~AdvTargetHit() = default;

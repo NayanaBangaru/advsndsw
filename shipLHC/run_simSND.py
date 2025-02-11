@@ -2,6 +2,7 @@
 import os
 import sys
 import ROOT
+import numpy as np
 
 import shipunit as u
 import shipRoot_conf
@@ -51,7 +52,11 @@ parser.add_argument("--debug",   dest="debug",   help="debugging mode, check for
 parser.add_argument("-D", "--display", dest="eventDisplay", help="store trajectories", required=False, action="store_true")
 parser.add_argument("--EmuDet","--nuTargetActive",dest="nuTargetPassive",help="activate emulsiondetector", required=False,action="store_false")
 parser.add_argument("--NagoyaEmu","--useNagoyaEmulsions",dest="useNagoyaEmulsions",help="use bricks of 57 Nagoya emulsion films instead of 60 Slavich", required=False,action="store_true")
-
+parser.add_argument("--multiplePGSources", help="Multiple particle guns in a x-y plane at a fixed z or in a 3D volume", action="store_true")
+parser.add_argument("--Dx", help="size of the full uniform spread of PG xpos", type=float)
+parser.add_argument("--Dy", help="size of the full uniform spread of PG ypos", type=float)
+parser.add_argument("--nZSlices", help="number of z slices for the PG sources", type=int)
+parser.add_argument("--zSliceStep", help="distance between the z slices for the PG sources", type=float)
 options = parser.parse_args()
 
 # user hook
@@ -157,9 +162,30 @@ if simEngine == "PG":
   myPgun = ROOT.FairBoxGenerator(options.pID,1)
   myPgun.SetPRange(options.Estart,options.Eend)
   myPgun.SetPhiRange(0, 360) # // Azimuth angle range [degree]
-  myPgun.SetXYZ(options.EVx*u.cm, options.EVy*u.cm, options.EVz*u.cm) 
-  myPgun.SetThetaRange(20,30) # // Polar angle in lab system range [degree]
+  # // myPgun.SetXYZ(options.EVx*u.cm, options.EVy*u.cm, options.EVz*u.cm) 
+  
+  if options.multiplePGSources:
+    # multiple PG sources in the x-y plane; z is always the same!
+      myPgun.SetBoxXYZ(options.EVx*u.cm,
+                     options.EVy*u.cm,
+                     (options.EVx+options.Dx)*u.cm,
+                     (options.EVy+options.Dy)*u.cm,
+                     options.EVz*u.cm)
+  else:
+     # point source
+      myPgun.SetXYZ(options.EVx*u.cm, options.EVy*u.cm, options.EVz*u.cm)
+  
+  myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
   primGen.AddGenerator(myPgun)
+    # To generate particle guns along the z axis, create z *target* layers with a set step
+  # For an **unknown** reason simply setting target z thickness doesn't produce the expected result
+  if options.multiplePGSources:
+    targetZpos = np.array(np.arange(options.nZSlices)*options.zSliceStep*u.cm, dtype='d')
+    primGen.SetMultTarget(len(targetZpos), targetZpos, 0*u.cm) # dummy thickness set to 0
+  print(f'===> Setting particle gun sources starting at (x1,y1,z1)=('+
+        f'{options.EVx},{options.EVy},{options.EVz})[cm × cm × cm] \n'+
+        f'with a uniform x-y spread of (Dx,Dy)=({options.Dx},{options.Dy})[cm × cm]'+
+        f' and {options.nZSlices} z slices in steps of {options.zSliceStep}[cm].')
   ROOT.FairLogger.GetLogger().SetLogScreenLevel("WARNING") # otherwise stupid printout for each event
 # -----muon DIS Background------------------------
 if simEngine == "muonDIS":
