@@ -56,6 +56,13 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, T
     *ChargeDriftPoint = DiffusionSignal;  
     *InducedChargePoint = TotalSignal; 
     *FEDResponsePoint = FEDResponseSignal;
+    // for(int k =0; k < TotalSignal.getStrips().size(); k++)
+    // {
+    //     if (V.size() == 1)
+    //     {
+    //     std::cout << k << "\t" << TotalSignal.getStrips()[k] << "\t" << EnergyLossVector[0].getDriftPos()[0][0] << "\t" << EnergyLossVector[0].getDriftPos()[0][1] << "\t" << V[0]->GetStation() << "\t" << V[0]->GetPlane() << "\t" << V[0]->GetRow() << "\t" <<  V[0]->GetColumn() << "\t" << V[0]->GetSensor() << "\t" << V[0]->GetModule() << std::endl; 
+    //     }
+    // }
 
     for (Int_t i = 0; i < 16; i++) {
         fMasked[i] = kFALSE;
