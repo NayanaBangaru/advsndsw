@@ -57,10 +57,10 @@ namespace frontend{
     const bool NoiseOption = 1; 
     const bool CMNoiseOption = 0;
     const bool ZSModeOption = 0; 
-    const Int_t StripNoise = 0; 
-    const Double_t NoiseRMS = 0; 
+    const Int_t StripNoise = 4; 
+    const Double_t NoiseRMS = 2; 
     const Double_t NoiseSigmaThreshold = 2; 
-    const Double_t CMNoise = 0; 
+    const Double_t CMNoise = 2; 
     const Int_t NumberofStrips = 768;
     const Int_t ZeroSuppressionMode = 4; 
     const Int_t ZeroSuppressionMode1T = 2; 
