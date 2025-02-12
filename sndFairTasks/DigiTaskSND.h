@@ -33,7 +33,7 @@ class DigiTaskSND : public FairTask
     /** Virtual method Init **/
     virtual InitStatus Init();
 
-    // virtual void Finish();
+    virtual void Finish();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -78,18 +78,18 @@ class DigiTaskSND : public FairTask
     AdvSignal* InducedChargePoint;
     AdvSignal* FEDResponsePoint; 
 
-    // Int_t event; 
-    // Int_t size;
-    // Int_t eventpoint; 
-    // AdvTargetPoint* advtargetpoint; 
-    // EnergyFluctUnit chargedivpoint; 
-    // SurfaceSignal chargedriftpoint;
-    // AdvSignal inducedchargepoint;
-    // AdvSignal fedresponsepoint; 
+    Int_t event; 
+    Int_t size;
+    Int_t eventpoint; 
+    AdvTargetPoint* advtargetpoint; 
+    EnergyFluctUnit chargedivpoint; 
+    SurfaceSignal chargedriftpoint;
+    AdvSignal inducedchargepoint;
+    AdvSignal fedresponsepoint; 
     
 
-    // TTree* tree; 
-    // TFile* ofile;
+    TTree* tree; 
+    TFile* ofile;
 
     ClassDef(DigiTaskSND, 3);
 };

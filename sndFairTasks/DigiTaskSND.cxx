@@ -33,6 +33,7 @@
 #include "digitisation/AdvSignal.h"
 #include "digitisation/EnergyFluctUnit.h"
 #include "digitisation/SurfaceSignal.h"
+#include <fstream>
 
 using namespace std;
 
@@ -143,28 +144,28 @@ InitStatus DigiTaskSND::Init()
     AdvTargetHits2MCPoints->BypassStreamer(kTRUE);
 
 
-    // ofile = new TFile("AdvSNDLHC_Digitisation.root", "RECREATE");
+    ofile = new TFile("AdvSNDLHC_Digitisation.root", "RECREATE");
 
-    // tree = new TTree("digis", "Digitisation Tree");
-    // advtargetpoint = nullptr; 
-    // tree->Branch("fEvent", &eventpoint);
-    // tree->Branch("fSize", &size);
-    // tree->Branch("fAdvTargetPoint", &advtargetpoint);
-    // tree->Branch("fChargeDivision", &chargedivpoint);
-    // tree->Branch("fChargeDrift", &chargedriftpoint);
-    // tree->Branch("fInducedCharge", &inducedchargepoint);
-    // tree->Branch("fFEDResponse", &fedresponsepoint);
+    tree = new TTree("digis", "Digitisation Tree");
+    advtargetpoint = nullptr; 
+    tree->Branch("fEvent", &eventpoint);
+    tree->Branch("fSize", &size);
+    tree->Branch("fAdvTargetPoint", &advtargetpoint);
+    tree->Branch("fChargeDivision", &chargedivpoint);
+    tree->Branch("fChargeDrift", &chargedriftpoint);
+    tree->Branch("fInducedCharge", &inducedchargepoint);
+    tree->Branch("fFEDResponse", &fedresponsepoint);
 
     return kSUCCESS;
 }
 
-// void DigiTaskSND::Finish()
-// {
-//     ofile->Write(); 
-//     ofile->Close();
-//     //delete ofile;
+void DigiTaskSND::Finish()
+{
+    ofile->Write(); 
+    ofile->Close();
+    //delete ofile;
 
-// }
+}
 
 void DigiTaskSND::Exec(Option_t* /*opt*/)
 {
@@ -248,6 +249,20 @@ void DigiTaskSND::digitiseAdvTarget()
         // Move to local coordinates (including rotation) to determine strip
         nav->MasterToLocal(global_pos, local_pos);
         int strip = floor((local_pos[0] / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
+
+            std::ofstream outFile("output.txt", std::ios::app);
+    
+        // Check if the file opened successfully
+        if (!outFile) {
+            std::cerr << "Error opening file!" << std::endl;
+        }
+        
+        // Append local_pos[0] to the file
+        outFile << local_pos[0] << "\t"  << local_pos[1] << std::endl;
+        
+        // Close the file
+        outFile.close();
+
         strip = max(0, strip);
         strip = min(advsnd::strips - 1, strip);
 
@@ -258,8 +273,8 @@ void DigiTaskSND::digitiseAdvTarget()
         norm[detector_id] += point->GetEnergyLoss();
     }
     
-    // event = 0; 
-    // size = 0; 
+    event = 0; 
+    size = 0; 
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID sensor + strip)
         ChargeDivisionPoint = new std::vector<EnergyFluctUnit>();
@@ -267,18 +282,18 @@ void DigiTaskSND::digitiseAdvTarget()
         InducedChargePoint = new AdvSignal();
         FEDResponsePoint = new AdvSignal();
         new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points, dat, ChargeDivisionPoint, ChargeDriftPoint, InducedChargePoint, FEDResponsePoint);
-        // event = event + 1; 
-        // for (int m = 0; m < ChargeDivisionPoint->size(); m++)
-        // {
-        //     size = points.size();
-        //     eventpoint = event; 
-        //     advtargetpoint = points[m];
-        //     chargedivpoint = (*ChargeDivisionPoint)[m]; 
-        //     chargedriftpoint = (*ChargeDriftPoint)[m];
-        //     inducedchargepoint = *InducedChargePoint;
-        //     fedresponsepoint = *FEDResponsePoint;
-        //     tree->Fill();
-        // }
+        event = event + 1; 
+        for (int m = 0; m < ChargeDivisionPoint->size(); m++)
+        {
+            size = points.size();
+            eventpoint = event; 
+            advtargetpoint = points[m];
+            chargedivpoint = (*ChargeDivisionPoint)[m]; 
+            chargedriftpoint = (*ChargeDriftPoint)[m];
+            inducedchargepoint = *InducedChargePoint;
+            fedresponsepoint = *FEDResponsePoint;
+            tree->Fill();
+        }
 
         auto point_map = mc_points[detector_id];
         for (const auto& [point_id, energy_loss] : point_map) {
