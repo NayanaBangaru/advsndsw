@@ -143,28 +143,28 @@ InitStatus DigiTaskSND::Init()
     AdvTargetHits2MCPoints->BypassStreamer(kTRUE);
 
 
-    ofile = new TFile("AdvSNDLHC_Digitisation.root", "RECREATE");
+    // ofile = new TFile("AdvSNDLHC_Digitisation.root", "RECREATE");
 
-    tree = new TTree("digis", "Digitisation Tree");
-    advtargetpoint = nullptr; 
-    tree->Branch("fEvent", &eventpoint);
-    tree->Branch("fSize", &size);
-    tree->Branch("fAdvTargetPoint", &advtargetpoint);
-    tree->Branch("fChargeDivision", &chargedivpoint);
-    tree->Branch("fChargeDrift", &chargedriftpoint);
-    tree->Branch("fInducedCharge", &inducedchargepoint);
-    tree->Branch("fFEDResponse", &fedresponsepoint);
+    // tree = new TTree("digis", "Digitisation Tree");
+    // advtargetpoint = nullptr; 
+    // tree->Branch("fEvent", &eventpoint);
+    // tree->Branch("fSize", &size);
+    // tree->Branch("fAdvTargetPoint", &advtargetpoint);
+    // tree->Branch("fChargeDivision", &chargedivpoint);
+    // tree->Branch("fChargeDrift", &chargedriftpoint);
+    // tree->Branch("fInducedCharge", &inducedchargepoint);
+    // tree->Branch("fFEDResponse", &fedresponsepoint);
 
     return kSUCCESS;
 }
 
-void DigiTaskSND::Finish()
-{
-    ofile->Write(); 
-    ofile->Close();
-    //delete ofile;
+// void DigiTaskSND::Finish()
+// {
+//     ofile->Write(); 
+//     ofile->Close();
+//     //delete ofile;
 
-}
+// }
 
 void DigiTaskSND::Exec(Option_t* /*opt*/)
 {
@@ -258,8 +258,8 @@ void DigiTaskSND::digitiseAdvTarget()
         norm[detector_id] += point->GetEnergyLoss();
     }
     
-    event = 0; 
-    size = 0; 
+    // event = 0; 
+    // size = 0; 
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID sensor + strip)
         ChargeDivisionPoint = new std::vector<EnergyFluctUnit>();
@@ -267,18 +267,18 @@ void DigiTaskSND::digitiseAdvTarget()
         InducedChargePoint = new AdvSignal();
         FEDResponsePoint = new AdvSignal();
         new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points, dat, ChargeDivisionPoint, ChargeDriftPoint, InducedChargePoint, FEDResponsePoint);
-        event = event + 1; 
-        for (int m = 0; m < ChargeDivisionPoint->size(); m++)
-        {
-            size = points.size();
-            eventpoint = event; 
-            advtargetpoint = points[m];
-            chargedivpoint = (*ChargeDivisionPoint)[m]; 
-            chargedriftpoint = (*ChargeDriftPoint)[m];
-            inducedchargepoint = *InducedChargePoint;
-            fedresponsepoint = *FEDResponsePoint;
-            tree->Fill();
-        }
+        // event = event + 1; 
+        // for (int m = 0; m < ChargeDivisionPoint->size(); m++)
+        // {
+        //     size = points.size();
+        //     eventpoint = event; 
+        //     advtargetpoint = points[m];
+        //     chargedivpoint = (*ChargeDivisionPoint)[m]; 
+        //     chargedriftpoint = (*ChargeDriftPoint)[m];
+        //     inducedchargepoint = *InducedChargePoint;
+        //     fedresponsepoint = *FEDResponsePoint;
+        //     tree->Fill();
+        // }
 
         auto point_map = mc_points[detector_id];
         for (const auto& [point_id, energy_loss] : point_map) {
