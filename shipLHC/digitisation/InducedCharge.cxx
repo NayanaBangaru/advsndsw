@@ -15,6 +15,7 @@
 #include <sstream>
 #include <filesystem>
 #include <random>
+#include <map>
 
 // Class for calculating the induced charge on the strips 
 
@@ -45,11 +46,6 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>& DiffusionSignal,
 
         for (int i = 0; i < surfacepos.size(); i++)
         {
-        //Getting the strips that would see the charge for each energy segment 
-        //std::cout << "Diffusion Signal Pos: " << i << "\t" << surfacepos[i][0] << "\t" << surfacepos[i][1] << "\t" << surfacepos[i][2] << std::endl ;
-        //std::cout << "Diffusion Signal Area: " << i << "\t" << diffusionarea[i] << std::endl ;
-        //std::cout << "Diffusion Signal Amplitude: " << i << "\t" << amplitude[i] << std::endl ;
-        
 
         AffectedStrips = GetStrips(surfacepos[i], diffusionarea[i]);   
 
@@ -64,18 +60,38 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>& DiffusionSignal,
                 x_end = ((AffectedStrips[j]+1) * (advsnd::sensor_width/advsnd::strips)) - (advsnd::sensor_width/2);
                 
                 z_start = (x_start - surfacepos[i].X()) / diffusionarea[i];
-                z_end = abs(x_end - surfacepos[i].X()) / diffusionarea[i];
-                integratedcharge = (erf((z_end) / TMath::Sqrt2()) / 2) - (erf((z_start) / TMath::Sqrt2()) / 2);
+                z_end = (x_end - surfacepos[i].X()) / diffusionarea[i];
+                integratedcharge = abs((erf((z_end) / TMath::Sqrt2()) / 2) - (erf((z_start) / TMath::Sqrt2()) / 2));
                 temp_AffectedStrips.push_back(AffectedStrips[j]);
                 ChargeDeposited.push_back(integratedcharge*amplitude[i]);   
                 //std::cout << "Affected Strips : " << j << "\t" << AffectedStrips[j] << "\t" << diffusionarea[i] << "\t" << surfacepos[i].X() << "\t" << amplitude[i] << "\t" << x_start << "\t" << x_end << "\t" << z_start << "\t" << z_end << "\t" << integratedcharge << "\t" << integratedcharge*amplitude[i] << std::endl;     
 
             }
+
+        // std::ofstream myfile; 
+        // myfile.open("output.txt", std::ios::out | std::ios::app);
+
+        // if (AffectedStrips.size() == 2)
+        // {
+        // // for(int xx = 0; xx < TotalSignalUnscale.getStrips().size(); xx_)
+        // // {
+        //     //std::cout << "ind : " << UniqueAffectedStrips[0] << "\t" << UniqueAffectedStrips[1] << "\t" << UniqueAffectedStrips[0] - UniqueAffectedStrips[1] << "\t" << TotalChargeDeposited[0] - TotalChargeDeposited[1] << std::endl; 
+        // //}
+        // if (((ChargeDeposited[0] - ChargeDeposited[1])>0) && (ChargeDeposited[1] != 0))
+        // {
+        //     myfile << 1 << std::endl; 
+        //     std::cout << AffectedStrips[0] << "\t" << AffectedStrips[1] << "\t" << ChargeDeposited[0] << "\t" << ChargeDeposited[1] << std::endl; 
+        // }else if (((ChargeDeposited[0] - ChargeDeposited[1])<0) && (ChargeDeposited[0] != 0)){
+        //     myfile << -1 << std::endl ; 
+        // }
+
+        // }
+        // myfile.close();
+
         }
 
 
-        Double_t z = accumulate(amplitude.begin(), amplitude.end(), 0);
-
+        Double_t z = accumulate(amplitude.begin(), amplitude.end(), 0.0);
         // Getting the unique strips 
 
         std::vector<AdvSignal> temp_Signalvector;
@@ -83,11 +99,10 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>& DiffusionSignal,
         temp_Signalvector.push_back(temp_signal);
         AdvSignal TotalSignalUnscale = Combine(temp_Signalvector);
 
-
         TotalChargeDeposited = TotalSignalUnscale.getIntegratedSignal();
         UniqueAffectedStrips = TotalSignalUnscale.getStrips();
 
-        Double_t r = accumulate(TotalChargeDeposited.begin(), TotalChargeDeposited.end(), 0);
+        Double_t r = accumulate(TotalChargeDeposited.begin(), TotalChargeDeposited.end(), 0.0);
         Double_t rescale_ratio = z/r;
         for (int m = 0; m < UniqueAffectedStrips.size(); m++)
         {
@@ -104,46 +119,63 @@ void InducedCharge::IntegrateCharge(std::vector<SurfaceSignal>& DiffusionSignal,
         } else {
             AdvSignal PulseSignal(UniqueAffectedStrips, TotalChargeDeposited); 
             ResponseSignal.push_back(PulseSignal);
-        }
+            }
+
     }
     TotalSignal = Combine(ResponseSignal);
+    
 }
 
 AdvSignal InducedCharge::Combine(std::vector<AdvSignal> Signal)
 {
-    std::vector<Int_t> CombinedStrips; 
-    std::vector<Double_t> CombinedCharge; 
 
-    for (int n = 0; n < Signal.size(); n++)
+    std::map<Int_t, Double_t> ChargeMap; 
+
+    std::vector<Int_t> CombinedStrips; 
+    std::vector<Double_t> CombinedCharge;
+
+    for (int n = 0; n < Signal.size(); ++n)
     {
-        for (int p = 0; p < (Signal[n].getStrips()).size(); p++)
+        CombinedStrips = Signal[n].getStrips(); 
+        CombinedCharge = Signal[n].getIntegratedSignal(); 
+
+        for (int l = 0; l < CombinedStrips.size(); l++)
         {
-            CombinedStrips.push_back(Signal[n].getStrips()[p]);
-            CombinedCharge.push_back(Signal[n].getIntegratedSignal()[p]);
+            ChargeMap[CombinedStrips[l]] += CombinedCharge[l]; 
         }
     }
 
-    std::vector<Int_t> UniqueAffectedStrips = CombinedStrips;  
+    std::vector<Int_t> UniqueAffectedStrips ;  
     std::vector<Double_t> SummedCharge ;
-    sort(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());
-    std::vector<int>::iterator itstrip;
-    itstrip = unique(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());  
-    UniqueAffectedStrips.resize(distance(UniqueAffectedStrips.begin(),itstrip));  
 
-    for (int l = 0; l < UniqueAffectedStrips.size(); l++)
+    for (const auto& entry : ChargeMap)
     {
-        Double_t temp_totalcharge = 0.0;
-        auto itfind = find(CombinedStrips.begin(), CombinedStrips.end(), UniqueAffectedStrips[l]); 
-        while (itfind != CombinedStrips.end()) { 
-            temp_totalcharge = temp_totalcharge + CombinedCharge[itfind - CombinedStrips.begin()];
-            itfind = find(itfind + 1, CombinedStrips.end(), UniqueAffectedStrips[l]); 
-        } 
-        SummedCharge.push_back(temp_totalcharge);
+        UniqueAffectedStrips.push_back(entry.first);
+        SummedCharge.push_back(entry.second); 
     }
 
-    AdvSignal CombinedSignal(UniqueAffectedStrips, SummedCharge); 
+    return AdvSignal(UniqueAffectedStrips, SummedCharge);
+    // std::vector<Int_t> UniqueAffectedStrips = CombinedStrips;  
+    // std::vector<Double_t> SummedCharge ;
+    // sort(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());
+    // std::vector<int>::iterator itstrip;
+    // itstrip = unique(UniqueAffectedStrips.begin(), UniqueAffectedStrips.end());  
+    // UniqueAffectedStrips.resize(distance(UniqueAffectedStrips.begin(),itstrip));  
 
-    return CombinedSignal;
+    // for (int l = 0; l < UniqueAffectedStrips.size(); l++)
+    // {
+    //     Double_t temp_totalcharge = 0.0;
+    //     auto itfind = find(CombinedStrips.begin(), CombinedStrips.end(), UniqueAffectedStrips[l]); 
+    //     while (itfind != CombinedStrips.end()) { 
+    //         temp_totalcharge = temp_totalcharge + CombinedCharge[itfind - CombinedStrips.begin()];
+    //         itfind = find(itfind + 1, CombinedStrips.end(), UniqueAffectedStrips[l]); 
+    //     } 
+    //     SummedCharge.push_back(temp_totalcharge);
+    // }
+
+    // AdvSignal CombinedSignal(UniqueAffectedStrips, SummedCharge); 
+
+    // return CombinedSignal;
 
 }
 

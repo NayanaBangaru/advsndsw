@@ -13,7 +13,7 @@ using namespace std;
 
 /* To Do : 
 Add Baseline Shift?
-Add Pedestals for each channel after calibration */
+Add Zero Suppress!!  */
 
 StripNoise::StripNoise() {}
 
@@ -31,6 +31,21 @@ AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
     }
     AdvSignal NoiseSignal(Strips, Amplitude); 
     return NoiseSignal; 
+}
+
+AdvSignal StripNoise::AddPedestals(AdvSignal Signal)
+{
+    std::vector<Int_t> Strips = Signal.getStrips();
+    std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
+
+    for (int i = 0 ; i < Strips.size() ; i++)
+    {
+        Amplitude[i] = Amplitude[i] + stripsensor::frontend::PedestalValue;
+    }
+
+    AdvSignal PedestalSignal(Strips, Amplitude); 
+
+    return PedestalSignal; 
 }
 
 AdvSignal StripNoise::AddGaussianTailNoise(AdvSignal Signal)

@@ -11,6 +11,7 @@ class StripNoise
 {
   public:
     StripNoise();
+    AdvSignal AddPedestals(AdvSignal Signal);
     AdvSignal AddGaussianNoise(AdvSignal Signal);
     AdvSignal AddGaussianTailNoise(AdvSignal Signal);
     AdvSignal AddCMNoise(AdvSignal Signal);

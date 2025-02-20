@@ -22,24 +22,21 @@ void FrontendDriver::FEDResponse(AdvSignal& Signal, AdvSignal& FEDResponseSignal
 
     StripNoise stripnoise{}; 
     InducedCharge inducedcharge{}; 
-    //cout << (Signal.getIntegratedSignal())[0] << endl; 
     
     if (stripsensor::frontend::ZSModeOption && stripsensor::frontend::NoiseOption)
     {
         FEDResponseSignal = stripnoise.AddGaussianTailNoise(ADCResponse);  
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
-        //cout << (FEDResponseSignal.getIntegratedSignal())[0] << endl;
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
-        //cout << (FEDResponseSignal.getIntegratedSignal())[0] << endl;
         FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
-        //cout << (FEDResponseSignal.getIntegratedSignal())[0] << endl;
     }
     if (!stripsensor::frontend::ZSModeOption)
     {
-        FEDResponseSignal = stripnoise.AddGaussianNoise(ADCResponse);
+        FEDResponseSignal = stripnoise.AddGaussianNoise(ADCResponse); 
         FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
+        FEDResponseSignal = stripnoise.AddPedestals(FEDResponseSignal);
     }
     FEDResponseSignal = SaturateRange(FEDResponseSignal);
 }
