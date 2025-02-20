@@ -136,12 +136,12 @@ void AdvTarget::ConstructGeometry()
     // See https://indico.cern.ch/event/1201858/#81-detector-simulation for technical diagrams and renders
     //
     // Passive part
-    TGeoBBox *Support = new TGeoBBox("Support", advsnd::module_length / 2, advsnd::module_width / 2, 3.0 * mm / 2);
+    TGeoBBox *Support = new TGeoBBox("Support", advsnd::module_width / 2, advsnd::module_length / 2, 3.0 * mm / 2);
     TGeoVolume *SupportVolume = new TGeoVolume("SupportVolume", Support, Polystyrene);
     SupportVolume->SetLineColor(kGray);
     // Active part
     TGeoBBox *SensorShape =
-        new TGeoBBox("SensorShape", advsnd::sensor_length / 2, advsnd::sensor_width / 2, 0.5 * mm / 2);
+        new TGeoBBox("SensorShape", advsnd::sensor_width / 2, advsnd::sensor_length / 2, 0.5 * mm / 2);
     TGeoVolume *SensorVolume = new TGeoVolume("SensorVolumeTarget", SensorShape, Silicon);
     SensorVolume->SetLineColor(kGreen);
     AddSensitiveVolume(SensorVolume);

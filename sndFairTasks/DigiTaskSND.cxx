@@ -249,20 +249,6 @@ void DigiTaskSND::digitiseAdvTarget()
         // Move to local coordinates (including rotation) to determine strip
         nav->MasterToLocal(global_pos, local_pos);
         int strip = floor((local_pos[0] / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
-
-            std::ofstream outFile("output.txt", std::ios::app);
-    
-        // Check if the file opened successfully
-        if (!outFile) {
-            std::cerr << "Error opening file!" << std::endl;
-        }
-        
-        // Append local_pos[0] to the file
-        outFile << local_pos[0] << "\t"  << local_pos[1] << std::endl;
-        
-        // Close the file
-        outFile.close();
-
         strip = max(0, strip);
         strip = min(advsnd::strips - 1, strip);
 

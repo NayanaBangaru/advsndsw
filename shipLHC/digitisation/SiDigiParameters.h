@@ -23,7 +23,7 @@ const Double_t noise_mean = 0;
 const Double_t noise_std_dev = 0.01; 
 
 namespace chargedivision{
-    const Int_t ChargeDivisionsperStrip = 10; // Number of divisions of the track length per strip 
+    const Double_t ChargeDivisionsperStrip = 10; // Number of divisions of the track length per strip 
     const float StripPitch = 120e-4; // Strip pitch of the detector 
 }
 
@@ -40,11 +40,11 @@ namespace drift{
 }
 
 namespace inducedcharge{
-    const Int_t NSigma = 3; 
+    const Double_t NSigma = 3; 
     const Double_t strip_width = 30.5e-4; //in cm  
     const Double_t strip_pitch = 122e-4; //in cm 
-    const bool Coupling = 0; 
-    const std::vector<Double_t> CouplingConstants = {0.98, 0.02};
+    const bool Coupling = 1; 
+    const std::vector<Double_t> CouplingConstants = {0.6, 0.4};
 }
 
 namespace frontend{
@@ -55,13 +55,14 @@ namespace frontend{
     const bool write_digi_to_text = 0; 
     const Int_t ElectronperADC = 250; 
     const bool NoiseOption = 1; 
-    const bool CMNoiseOption = 0;
+    const bool CMNoiseOption = 1;
     const bool ZSModeOption = 0; 
-    const Int_t StripNoise = 4; 
-    const Double_t NoiseRMS = 2; 
+    const Double_t PedestalValue = 230; 
+    const Double_t StripNoise = 4; 
+    const Double_t NoiseRMS = 10;
     const Double_t NoiseSigmaThreshold = 2; 
-    const Double_t CMNoise = 2; 
-    const Int_t NumberofStrips = 768;
+    const Double_t CMNoise = 3; 
+    const Double_t NumberofStrips = 768;
     const Int_t ZeroSuppressionMode = 4; 
     const Int_t ZeroSuppressionMode1T = 2; 
 }
