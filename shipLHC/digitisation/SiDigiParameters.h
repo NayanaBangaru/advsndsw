@@ -44,7 +44,7 @@ namespace inducedcharge{
     const Double_t strip_width = 30.5e-4; //in cm  
     const Double_t strip_pitch = 122e-4; //in cm 
     const bool Coupling = 1; 
-    const std::vector<Double_t> CouplingConstants = {0.6, 0.4};
+    const std::vector<Double_t> CouplingConstants = {0.98, 0.02};
 }
 
 namespace frontend{
@@ -57,11 +57,11 @@ namespace frontend{
     const bool NoiseOption = 1; 
     const bool CMNoiseOption = 1;
     const bool ZSModeOption = 0; 
-    const Double_t PedestalValue = 230; 
-    const Double_t StripNoise = 4; 
-    const Double_t NoiseRMS = 10;
+    const Double_t PedestalValue = 5; 
+    const Double_t StripNoise = 5; 
+    const Double_t NoiseRMS = 5;
     const Double_t NoiseSigmaThreshold = 2; 
-    const Double_t CMNoise = 3; 
+    const Double_t CMNoise = 2;
     const Double_t NumberofStrips = 768;
     const Int_t ZeroSuppressionMode = 4; 
     const Int_t ZeroSuppressionMode1T = 2; 

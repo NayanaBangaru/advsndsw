@@ -46,7 +46,9 @@ class AdvTargetHit : public SndlhcHit
   private:
     bool flag;          ///< flag
     bool fMasked[16];   /// masked signal
-    std::map<std::string, std::vector<Int_t>> fDigitisedHit; 
+    //int fResponseHit[768]; 
+    std::unordered_map<std::string, std::vector<Int_t>> fDigitisedHit; 
+    Int_t size ; 
     ClassDef(AdvTargetHit, 1);
 };
 

@@ -189,6 +189,7 @@ std::vector<Int_t> InducedCharge::GetStrips(TVector3 point, Double_t area)
     int fromstrip = floor(((point.X() - (stripsensor::inducedcharge::NSigma*area)) + (advsnd::sensor_width/2))/(advsnd::sensor_width/advsnd::strips));
     fromstrip = std::max(0, fromstrip);
     fromstrip = std::min(advsnd::strips - 1, fromstrip); 
+    //std::cout << ((point.X() - (stripsensor::inducedcharge::NSigma*area)) + (advsnd::sensor_width/2))/(advsnd::sensor_width/advsnd::strips) << "\t" << fromstrip << std::endl ;
 
     //int tostrip = floor(((point.X()+(stripsensor::inducedcharge::NSigma*area)) / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
     int tostrip = floor(((point.X() + (stripsensor::inducedcharge::NSigma*area)) + (advsnd::sensor_width/2))/(advsnd::sensor_width/advsnd::strips));

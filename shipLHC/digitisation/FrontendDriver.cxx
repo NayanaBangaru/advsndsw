@@ -36,9 +36,10 @@ void FrontendDriver::FEDResponse(AdvSignal& Signal, AdvSignal& FEDResponseSignal
         FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
+        //FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
         FEDResponseSignal = stripnoise.AddPedestals(FEDResponseSignal);
     }
-    FEDResponseSignal = SaturateRange(FEDResponseSignal);
+    //FEDResponseSignal = SaturateRange(FEDResponseSignal);
 }
 
 AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
@@ -180,6 +181,9 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
             {
                 if (Amplitude[i] > 3*stripsensor::frontend::StripNoise)
                 {
+                    //cout << "Amp : " <<  Amplitude[i] << endl; 
+                    temp_ClusterStrips.push_back(Strips[i]); 
+                    temp_ClusterAmplitudes.push_back(Amplitude[i]); 
                     ClusterStrips.push_back(Strips[i]); 
                     ClusterAmplitudes.push_back(Amplitude[i]); 
                 }
@@ -188,34 +192,61 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
             Int_t neighbhourlower = 0; 
             Int_t j = 0; 
             std::vector<Int_t> Clusters ; 
+            std::vector<Int_t> SingleClusters;
             while (j < temp_ClusterStrips.size())
             {
                 neighbhour = 1; 
                 neighbhourlower = 1;
-                while((std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]+neighbhour)!=temp_ClusterStrips.end())) 
+                while ((std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j] + neighbhour) != temp_ClusterStrips.end()) ||
+            (std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j] - neighbhourlower) != temp_ClusterStrips.end()))
                 {
-                    if((std::find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[j])==ClusterStrips.end()))
+                    if (std::find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[j]) == ClusterStrips.end())
                     {
                         ClusterStrips.push_back(temp_ClusterStrips[j]);
                         ClusterAmplitudes.push_back(temp_ClusterAmplitudes[j]);   
                     }
-                    auto it = std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j]+neighbhour );
-                    if ((temp_ClusterAmplitudes[it - temp_ClusterStrips.begin()])>2*stripsensor::frontend::StripNoise)
+
+                    // Check for +1 neighbor
+                    auto it_forward = std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j] + neighbhour);
+                    if (it_forward != temp_ClusterStrips.end())
                     {
-                        ClusterStrips.push_back(temp_ClusterStrips[it - temp_ClusterStrips.begin()]);
-                        ClusterAmplitudes.push_back(temp_ClusterAmplitudes[it - temp_ClusterStrips.begin()]);
+                        int index_forward = it_forward - temp_ClusterStrips.begin();
+                        if (std::find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[index_forward]) == ClusterStrips.end() &&
+                            temp_ClusterAmplitudes[index_forward] > 2 * stripsensor::frontend::StripNoise)
+                        {
+                            ClusterStrips.push_back(temp_ClusterStrips[index_forward]);
+                            ClusterAmplitudes.push_back(temp_ClusterAmplitudes[index_forward]);
+                        }
                         neighbhour += 1; 
                     }
-                    
-                } 
+
+                    // Check for -1 neighbor
+                    auto it_backward = std::find(temp_ClusterStrips.begin(), temp_ClusterStrips.end(), temp_ClusterStrips[j] - neighbhourlower);
+                    if (it_backward != temp_ClusterStrips.end())
+                    {
+                        int index_backward = it_backward - temp_ClusterStrips.begin();
+                        if (std::find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[index_backward]) == ClusterStrips.end() &&
+                            temp_ClusterAmplitudes[index_backward] > 2 * stripsensor::frontend::StripNoise)
+                        {
+                            ClusterStrips.push_back(temp_ClusterStrips[index_backward]);
+                            ClusterAmplitudes.push_back(temp_ClusterAmplitudes[index_backward]);
+                        }
+                        neighbhourlower += 1; 
+                    }
+                }
+
+
+
                 if (neighbhour > 1)
                 {
                     Clusters.push_back(j); 
                     Clusters.push_back(j+neighbhour);
+                }else{
+                    SingleClusters.push_back(j);
                 }
                 j = j + neighbhour; 
             }
-  
+
             for (int l = 0; l < Clusters.size(); l+=2)
             {
                 for (int m = Clusters[l]; m < Clusters[l+1]; m++)
@@ -223,14 +254,29 @@ AdvSignal FrontendDriver::ZeroSuppressionAlgorithms(AdvSignal Signal)
                     SumCharge += temp_ClusterAmplitudes[m]; 
                     SumNoise += pow(stripsensor::frontend::StripNoise, 2);
                 } 
-                if (SumCharge < 5*SumNoise)
+                if (SumCharge < SumNoise)
                 {
-                     
+                        
                     for (int m = Clusters[l]; m < Clusters[l+1]; m++)
                     {
                         ClusterStrips.erase(find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[m]));
                         ClusterAmplitudes.erase(find(ClusterAmplitudes.begin(), ClusterAmplitudes.end(), temp_ClusterAmplitudes[m]));
                     } 
+                }
+                SumCharge = 0 ; 
+                SumNoise = 0 ; 
+            }
+
+            for (int l = 0; l < SingleClusters.size(); ++l)
+            {
+                    int pos = SingleClusters[l];
+                    SumCharge = temp_ClusterAmplitudes[pos]; 
+                    SumNoise = pow(stripsensor::frontend::StripNoise, 2);
+                if (SumCharge < 5*SumNoise)
+                {
+                        
+                        ClusterStrips.erase(find(ClusterStrips.begin(), ClusterStrips.end(), temp_ClusterStrips[pos]));
+                        ClusterAmplitudes.erase(find(ClusterAmplitudes.begin(), ClusterAmplitudes.end(), temp_ClusterAmplitudes[pos]));
                 }
                 SumCharge = 0 ; 
                 SumNoise = 0 ; 

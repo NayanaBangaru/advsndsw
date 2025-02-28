@@ -268,14 +268,14 @@ void DigiTaskSND::digitiseAdvTarget()
         event = event + 1; 
         for (int m = 0; m < ChargeDivisionPoint->size(); m++)
         {
-            size = points.size();
-            eventpoint = event; 
-            advtargetpoint = points[m];
-            chargedivpoint = (*ChargeDivisionPoint)[m]; 
-            chargedriftpoint = (*ChargeDriftPoint)[m];
-            inducedchargepoint = *InducedChargePoint;
-            fedresponsepoint = *FEDResponsePoint;
-            tree->Fill();
+           size = points.size();
+           eventpoint = event; 
+           advtargetpoint = points[m];
+           chargedivpoint = (*ChargeDivisionPoint)[m]; 
+           chargedriftpoint = (*ChargeDriftPoint)[m];
+           inducedchargepoint = *InducedChargePoint;
+           fedresponsepoint = *FEDResponsePoint;
+           tree->Fill();
         }
 
         auto point_map = mc_points[detector_id];

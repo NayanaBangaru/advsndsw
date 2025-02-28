@@ -28,13 +28,11 @@ using namespace std;
 // Running the digitisation 
 
 /* To be included :
-    Saturation of FED dynamic range depending on mode 
-    Add noise
     Add FED modes */
 
 AdvDigitisation::AdvDigitisation() {}
 
-std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t detID, const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit>& EnergyLossVector, std::vector<SurfaceSignal>& DiffusionSignal, AdvSignal& TotalSignal, AdvSignal& FEDResponseSignal)
+std::unordered_map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t detID, const std::vector<AdvTargetPoint *> &V, std::vector<EnergyFluctUnit>& EnergyLossVector, std::vector<SurfaceSignal>& DiffusionSignal, AdvSignal& TotalSignal, AdvSignal& FEDResponseSignal)
 {
     // Charge Division
     ChargeDivision chargedivision{};
@@ -52,7 +50,7 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
     frontenddriver.FEDResponse(TotalSignal, FEDResponseSignal);
 
     //Creating map of hit 
-    std::map<std::string, std::vector<Int_t>> DigitisedHit; 
+    std::unordered_map<std::string, std::vector<Int_t>> DigitisedHit; 
     std::vector<Double_t> Charge = FEDResponseSignal.getIntegratedSignal();
     std::vector<Int_t> Strips = FEDResponseSignal.getStrips();
     std::vector<Int_t> ADC(Charge.size()); 
