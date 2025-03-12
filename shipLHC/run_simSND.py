@@ -175,7 +175,7 @@ if simEngine == "PG":
      # point source
       myPgun.SetXYZ(options.EVx*u.cm, options.EVy*u.cm, options.EVz*u.cm)
   
-  myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
+  myPgun.SetThetaRange(0,10) # // Polar angle in lab system range [degree]
   primGen.AddGenerator(myPgun)
     # To generate particle guns along the z axis, create z *target* layers with a set step
   # For an **unknown** reason simply setting target z thickness doesn't produce the expected result

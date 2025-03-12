@@ -43,7 +43,7 @@ namespace inducedcharge{
     const Double_t NSigma = 3; 
     const Double_t strip_width = 30.5e-4; //in cm  
     const Double_t strip_pitch = 122e-4; //in cm 
-    const bool Coupling = 0; 
+    const bool Coupling = 1; 
     const std::vector<Double_t> CouplingConstants = {0.98, 0.02};
 }
 
