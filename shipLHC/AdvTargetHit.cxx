@@ -50,14 +50,16 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, T
     AdvSignal TotalSignal;
     AdvSignal FEDResponseSignal;
 
-    std::unordered_map<std::string, std::vector<Int_t>> fDigitisedHit;
+    //std::unordered_map<std::string, std::vector<Int_t>> fDigitisedHit;
     fDigitisedHit = advdigi.digirunoutput(detID, V, EnergyLossVector, DiffusionSignal, TotalSignal, FEDResponseSignal);
     flag = true;
 
-    for (int i =0; i < 769; i++)
-    {
-        fResponseHit[i] = i; 
-    }
+    size = V.size(); 
+
+    // for (int i =0; i < 769; i++)
+    // {
+    //     fResponseHit[i] = i; 
+    // }
 
     *ChargeDivisionPoint = EnergyLossVector;
     *ChargeDriftPoint = DiffusionSignal;  

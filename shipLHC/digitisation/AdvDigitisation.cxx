@@ -28,8 +28,6 @@ using namespace std;
 // Running the digitisation 
 
 /* To be included :
-    Saturation of FED dynamic range depending on mode 
-    Add noise
     Add FED modes */
 
 AdvDigitisation::AdvDigitisation() {}

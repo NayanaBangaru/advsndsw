@@ -57,7 +57,7 @@ namespace frontend{
     const bool NoiseOption = 1; 
     const bool CMNoiseOption = 1;
     const bool ZSModeOption = 0; 
-    const Double_t PedestalValue = 230; 
+    const Double_t PedestalValue = 5; 
     const Double_t StripNoise = 5; 
     const Double_t NoiseRMS = 5;
     const Double_t NoiseSigmaThreshold = 2; 

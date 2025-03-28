@@ -33,7 +33,8 @@ class AdvTargetHit : public SndlhcHit
     bool isValid() const { return flag; }
     bool isMasked(Int_t i) const { return fMasked[i]; }
     void SetMasked(Int_t i) { fMasked[i] = kTRUE; }
-    //std::unordered_map<std::string, std::vector<Int_t>> GetHit() { return fDigitisedHit; }
+    std::unordered_map<std::string, std::vector<Int_t>> GetHit() { return fDigitisedHit; }
+    int constexpr GetSize() {return size; }
     int constexpr GetStation() { return fDetectorID >> 17; }
     int constexpr GetPlane() { return (fDetectorID >> 16) % 2; }   // 0 is X-plane, 1 is Y-pane
     int constexpr GetRow() { return (fDetectorID >> 13) % 8; }
@@ -47,8 +48,9 @@ class AdvTargetHit : public SndlhcHit
   private:
     bool flag;          ///< flag
     bool fMasked[16];   /// masked signal
-    uint16_t fResponseHit[768]; 
-    //std::unordered_map<std::string, std::vector<Int_t>> fDigitisedHit; 
+    //int fResponseHit[768]; 
+    std::unordered_map<std::string, std::vector<Int_t>> fDigitisedHit; 
+    Int_t size ; 
     ClassDef(AdvTargetHit, 1);
 };
 

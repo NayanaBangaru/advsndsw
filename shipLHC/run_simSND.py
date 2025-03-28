@@ -161,7 +161,7 @@ primGen = ROOT.FairPrimaryGenerator()
 if simEngine == "PG": 
   myPgun = ROOT.FairBoxGenerator(options.pID,1)
   myPgun.SetPRange(options.Estart,options.Eend)
-  myPgun.SetPhiRange(0, 360) # // Azimuth angle range [degree]
+  myPgun.SetPhiRange(0, 0) # // Azimuth angle range [degree]
   # // myPgun.SetXYZ(options.EVx*u.cm, options.EVy*u.cm, options.EVz*u.cm) 
   
   if options.multiplePGSources:
@@ -175,7 +175,7 @@ if simEngine == "PG":
      # point source
       myPgun.SetXYZ(options.EVx*u.cm, options.EVy*u.cm, options.EVz*u.cm)
   
-  myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
+  myPgun.SetThetaRange(2,2) # // Polar angle in lab system range [degree]
   primGen.AddGenerator(myPgun)
     # To generate particle guns along the z axis, create z *target* layers with a set step
   # For an **unknown** reason simply setting target z thickness doesn't produce the expected result
