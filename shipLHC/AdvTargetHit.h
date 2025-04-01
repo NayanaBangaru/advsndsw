@@ -24,7 +24,6 @@ class AdvTargetHit : public SndlhcHit
 
     // Constructor from AdvTargetPoint
     AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, TNtuple* dat, std::vector<EnergyFluctUnit>* ChargeDivisionPoint, std::vector<SurfaceSignal>* ChargeDriftPoint, AdvSignal* InducedChargePoint, AdvSignal* FEDResponsePoint);
-
     /** Destructor **/
     ~AdvTargetHit() = default;
 
@@ -33,8 +32,8 @@ class AdvTargetHit : public SndlhcHit
     bool isValid() const { return flag; }
     bool isMasked(Int_t i) const { return fMasked[i]; }
     void SetMasked(Int_t i) { fMasked[i] = kTRUE; }
-    std::unordered_map<std::string, std::vector<Int_t>> GetHit() { return fDigitisedHit; }
-    int constexpr GetSize() {return size; }
+    //std::unordered_map<std::string, std::vector<Int_t>> GetHit() { return fDigitisedHit; }
+    //int constexpr GetSize() {return size; }
     int constexpr GetStation() { return fDetectorID >> 17; }
     int constexpr GetPlane() { return (fDetectorID >> 16) % 2; }   // 0 is X-plane, 1 is Y-pane
     int constexpr GetRow() { return (fDetectorID >> 13) % 8; }

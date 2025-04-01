@@ -2,6 +2,10 @@
 #include "AdvTargetPoint.h"
 #include "digitisation/AdvSignal.h"
 #include "digitisation/AdvDigitisation.h"
+#include "digitisation/ChargeDivision.h"
+#include "digitisation/ChargeDrift.h"
+#include "digitisation/InducedCharge.h"
+#include "digitisation/FrontendDriver.h"
 #include "FairLogger.h"
 #include "TGeoBBox.h"
 #include "TGeoManager.h"
@@ -65,6 +69,7 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, T
     *ChargeDriftPoint = DiffusionSignal;  
     *InducedChargePoint = TotalSignal; 
     *FEDResponsePoint = FEDResponseSignal;
+
 
     for (Int_t i = 0; i < 16; i++) {
         fMasked[i] = kFALSE;

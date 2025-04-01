@@ -11,6 +11,7 @@
 #include "digitisation/EnergyFluctUnit.h"
 #include "digitisation/SurfaceSignal.h"
 
+
 #include <Rtypes.h>       // for THashConsistencyHolder, ClassDef
 #include <RtypesCore.h>   // for Double_t, Int_t, Option_t
 #include <TClonesArray.h>
@@ -34,7 +35,6 @@ class DigiTaskSND : public FairTask
     virtual InitStatus Init();
 
     virtual void Finish();
-
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
 
@@ -90,6 +90,7 @@ class DigiTaskSND : public FairTask
 
     TTree* tree; 
     TFile* ofile;
+
 
     ClassDef(DigiTaskSND, 3);
 };

@@ -29,6 +29,7 @@
 #include <algorithm>   // std::sort
 #include <iostream>    // for operator<<, basic_ostream, endl
 #include <vector>      // std::vector
+
 #include <TNtuple.h>
 #include "digitisation/AdvSignal.h"
 #include "digitisation/EnergyFluctUnit.h"
@@ -143,7 +144,6 @@ InitStatus DigiTaskSND::Init()
     ioman->Register("Digi_AdvTargetHits2MCPoints", "DigiAdvTargetHits2MCPoints_det", AdvTargetHits2MCPoints, kTRUE);
     AdvTargetHits2MCPoints->BypassStreamer(kTRUE);
 
-
     ofile = new TFile("AdvSNDLHC_Digitisation.root", "RECREATE");
 
     tree = new TTree("digis", "Digitisation Tree");
@@ -218,19 +218,16 @@ void DigiTaskSND::digitiseAdvTarget()
     for (auto* ptr : *AdvTargetPoints) {
         auto* point = dynamic_cast<AdvTargetPoint*>(ptr);
         auto detID = point->GetDetectorID();
-        int station = point->GetStation();
-        int plane = point->GetPlane();
+        int layer = point->GetLayer();
         int sensor_module = point->GetModule();
         int sensor = detID;
         auto path = TString::Format("/cave_1/"
                                     "Detector_0/"
-                                    "volAdvTarget_1/"
-                                    "TrackingStation_%d/"
-                                    "TrackerPlane_%d/"
+                                    "volAdvTarget_0/"
+                                    "Target_Layer_%d/"
                                     "SensorModule_%d/"
-                                    "SensorVolumeTarget_%d",
-                                    station,
-                                    plane,
+                                    "Target_SensorVolume_%d",
+                                    layer,
                                     sensor_module,
                                     sensor);
         // TODO loop by module?
@@ -248,7 +245,7 @@ void DigiTaskSND::digitiseAdvTarget()
         double local_pos[3];
         // Move to local coordinates (including rotation) to determine strip
         nav->MasterToLocal(global_pos, local_pos);
-        int strip = floor((local_pos[0] / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
+        int strip = floor((local_pos[1] / (advsnd::sensor_length / advsnd::strips)) + (advsnd::strips / 2));
         strip = max(0, strip);
         strip = min(advsnd::strips - 1, strip);
 
@@ -258,9 +255,7 @@ void DigiTaskSND::digitiseAdvTarget()
         mc_points[detector_id][point_index++] = point->GetEnergyLoss();
         norm[detector_id] += point->GetEnergyLoss();
     }
-    
-    event = 0; 
-    size = 0; 
+
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID sensor + strip)
         ChargeDivisionPoint = new std::vector<EnergyFluctUnit>();
@@ -268,18 +263,20 @@ void DigiTaskSND::digitiseAdvTarget()
         InducedChargePoint = new AdvSignal();
         FEDResponsePoint = new AdvSignal();
         new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points, dat, ChargeDivisionPoint, ChargeDriftPoint, InducedChargePoint, FEDResponsePoint);
-        event = event + 1; 
+        // event = event + 1; 
         for (int m = 0; m < ChargeDivisionPoint->size(); m++)
         {
-           size = points.size();
-           eventpoint = event; 
-           advtargetpoint = points[m];
-           chargedivpoint = (*ChargeDivisionPoint)[m]; 
-           chargedriftpoint = (*ChargeDriftPoint)[m];
-           inducedchargepoint = *InducedChargePoint;
-           fedresponsepoint = *FEDResponsePoint;
-           tree->Fill();
+            size = points.size();
+            eventpoint = event; 
+            advtargetpoint = points[m];
+            chargedivpoint = (*ChargeDivisionPoint)[m]; 
+            chargedriftpoint = (*ChargeDriftPoint)[m];
+            inducedchargepoint = *InducedChargePoint;
+            fedresponsepoint = *FEDResponsePoint;
+            tree->Fill();
         }
+        //new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points);
+        
 
         auto point_map = mc_points[detector_id];
         for (const auto& [point_id, energy_loss] : point_map) {
@@ -287,7 +284,6 @@ void DigiTaskSND::digitiseAdvTarget()
         }
     }
     new ((*AdvTargetHits2MCPoints)[0]) Hit2MCPoints(mc_links);
-    
 }
 
 void DigiTaskSND::digitiseAdvMuFilter()
@@ -308,19 +304,16 @@ void DigiTaskSND::digitiseAdvMuFilter()
     for (auto* ptr : *AdvMuFilterPoints) {
         auto* point = dynamic_cast<AdvMuFilterPoint*>(ptr);
         auto detID = point->GetDetectorID();
-        int station = point->GetStation();
-        int plane = point->GetPlane();
+        int layer = point->GetLayer();
         int sensor_module = point->GetModule();
         int sensor = detID;
         auto path = TString::Format("/cave_1/"
                                     "Detector_0/"
                                     "volAdvMuFilter_0/"
-                                    "TrackingStation_%d/"
-                                    "TrackerPlane_%d/"
+                                    "HCAL_Layer_%d/"
                                     "SensorModule_%d/"
-                                    "SensorVolumeFilter_%d",
-                                    station,
-                                    plane,
+                                    "HCAL_SensorVolume_%d",
+                                    layer,
                                     sensor_module,
                                     sensor);
         // TODO loop by module?
@@ -338,7 +331,7 @@ void DigiTaskSND::digitiseAdvMuFilter()
         double local_pos[3];
         // Move to local coordinates (including rotation) to determine strip
         nav->MasterToLocal(global_pos, local_pos);
-        int strip = floor((local_pos[0] / (advsnd::sensor_width / advsnd::strips)) + (advsnd::strips / 2));
+        int strip = floor((local_pos[1] / (advsnd::sensor_length / advsnd::strips)) + (advsnd::strips / 2));
         strip = max(0, strip);
         strip = min(advsnd::strips - 1, strip);
 
