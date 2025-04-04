@@ -86,7 +86,6 @@ class DigiTaskSND : public FairTask
     SurfaceSignal chargedriftpoint;
     AdvSignal inducedchargepoint;
     AdvSignal fedresponsepoint; 
-    
 
     TTree* tree; 
     TFile* ofile;
