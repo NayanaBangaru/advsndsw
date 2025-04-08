@@ -36,7 +36,7 @@ void FrontendDriver::FEDResponse(AdvSignal& Signal, AdvSignal& FEDResponseSignal
         FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
-        //FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
+        FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
         FEDResponseSignal = stripnoise.AddPedestals(FEDResponseSignal);
     }
     //FEDResponseSignal = SaturateRange(FEDResponseSignal);

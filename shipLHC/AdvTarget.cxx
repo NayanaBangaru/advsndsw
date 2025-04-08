@@ -132,30 +132,7 @@ void AdvTarget::ConstructGeometry()
     Double_t fPlateFrameY = conf_floats["AdvTarget/PlateFrameY"];
     Double_t fPlateFrameZ = conf_floats["AdvTarget/PlateFrameZ"];
     Double_t fTTZ = conf_floats["AdvTarget/TTZ"];
-<<<<<<< HEAD
     Int_t fNlayers = conf_ints["AdvTarget/nTT"];   // Number of TT layers
-=======
-    Int_t stations = conf_ints["AdvTarget/nTT"];   // Number of TT stations
-
-    TGeoBBox *TargetWall = new TGeoBBox("TargetWall", fTargetWallX / 2., fTargetWallY / 2., fTargetWallZ / 2.);
-    TGeoVolume *volTargetWall = new TGeoVolume("volTargetWall", TargetWall, tungsten);
-    volTargetWall->SetLineColor(kRed);
-
-    // Silicon tracker module
-    //
-    // See https://indico.cern.ch/event/1201858/#81-detector-simulation for technical diagrams and renders
-    //
-    // Passive part
-    TGeoBBox *Support = new TGeoBBox("Support", advsnd::module_width / 2, advsnd::module_length / 2, 3.0 * mm / 2);
-    TGeoVolume *SupportVolume = new TGeoVolume("SupportVolume", Support, Polystyrene);
-    SupportVolume->SetLineColor(kGray);
-    // Active part
-    TGeoBBox *SensorShape =
-        new TGeoBBox("SensorShape", advsnd::sensor_width / 2, advsnd::sensor_length / 2, 0.5 * mm / 2);
-    TGeoVolume *SensorVolume = new TGeoVolume("SensorVolumeTarget", SensorShape, Silicon);
-    SensorVolume->SetLineColor(kGreen);
-    AddSensitiveVolume(SensorVolume);
->>>>>>> a5541f8 (added pedestal)
 
     // Definition of the target box containing tungsten walls + silicon tracker
     TGeoVolumeAssembly *volAdvTarget = new TGeoVolumeAssembly("volAdvTarget");
