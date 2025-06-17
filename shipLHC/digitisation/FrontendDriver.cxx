@@ -48,6 +48,10 @@ AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
         for (int i = 0; i < NumberofElectrons.size(); i++)
         {
             ADCcount.push_back(std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC));
+            if (std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC) > 1000000)
+            {
+                std::cout << "YO : " << std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC) << std::endl; 
+            }
         }
 
         AdvSignal ADCResponse(ResponseSignal.getStrips(), ADCcount);

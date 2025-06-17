@@ -28,7 +28,9 @@ using namespace std;
 // Running the digitisation 
 
 /* To be included :
-    Add FED modes */
+    Add FED modes (FED mode implemented essentially ZS applied on top of VR mode)
+    FED does not merge clusters at chip boundaries, needs to be implemented 
+    APV killer for HIP needs to be implemented*/
 
 AdvDigitisation::AdvDigitisation() {}
 
@@ -46,6 +48,7 @@ std::unordered_map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutp
     InducedCharge inducedcharge{};
     inducedcharge.IntegrateCharge(DiffusionSignal, TotalSignal);
 
+    //Frontend Driver Response 
     FrontendDriver frontenddriver{};
     frontenddriver.FEDResponse(TotalSignal, FEDResponseSignal);
 
