@@ -39,7 +39,7 @@ void FrontendDriver::FEDResponse(AdvSignal& Signal, AdvSignal& FEDResponseSignal
         FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
         FEDResponseSignal = stripnoise.AddPedestals(FEDResponseSignal);
     }
-    //FEDResponseSignal = SaturateRange(FEDResponseSignal);
+    FEDResponseSignal = TestSaturateRange(FEDResponseSignal);
 }
 
 AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
@@ -57,6 +57,20 @@ AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
         AdvSignal ADCResponse(ResponseSignal.getStrips(), ADCcount);
 
         return ADCResponse; 
+}
+
+AdvSignal FrontendDriver::TestSaturateRange(AdvSignal Signal)
+{
+    std::vector<Double_t> Charge = Signal.getIntegratedSignal();
+    for (int i = 0; i < Charge.size(); i++)
+    {
+            if (Charge[i] < 0)
+            {
+                Charge[i] = 0; 
+            }
+    }
+    AdvSignal SaturatedSignal(Signal.getStrips(), Charge);
+    return SaturatedSignal; 
 }
 
 AdvSignal FrontendDriver::SaturateRange(AdvSignal Signal)

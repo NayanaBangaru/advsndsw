@@ -65,5 +65,13 @@ std::unordered_map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutp
     DigitisedHit["Strips"] = Strips; 
     DigitisedHit["ADC"] = ADC;
 
+    for(int i = 0; i < ADC.size(); ++i)
+    {
+        if (ADC[i]>1000000)
+        {
+            std::cout <<"AHHHHHHHHHH : " << ADC[i] << endl; 
+        }
+    }
+
     return DigitisedHit;
 }

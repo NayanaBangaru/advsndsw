@@ -122,7 +122,7 @@ void ChargeDivision::Divide(Int_t detID, const std::vector<AdvTargetPoint*>& V, 
             ParticleMass = (TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Mass()) * 1000; // in MeV
             ParticleCharge = TDatabasePDG::Instance()->GetParticle(V[i]->PdgCode())->Charge(); 
         } else {
-            std::cout << "Could not find particle " << pdgcode << " , assuming pion mass and charge." << std::endl;
+            //std::cout << "Could not find particle " << pdgcode << " , assuming pion mass and charge." << std::endl;
             ParticleMass = 139.57; 
             ParticleCharge = 1; 
 
