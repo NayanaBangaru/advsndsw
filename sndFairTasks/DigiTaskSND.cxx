@@ -143,29 +143,9 @@ InitStatus DigiTaskSND::Init()
     ioman->Register("Digi_AdvTargetHits2MCPoints", "DigiAdvTargetHits2MCPoints_det", AdvTargetHits2MCPoints, kTRUE);
     AdvTargetHits2MCPoints->BypassStreamer(kTRUE);
 
-
-    ofile = new TFile("AdvSNDLHC_Digitisation.root", "RECREATE");
-
-    tree = new TTree("digis", "Digitisation Tree");
-    advtargetpoint = nullptr; 
-    tree->Branch("fEvent", &eventpoint);
-    tree->Branch("fSize", &size);
-    tree->Branch("fAdvTargetPoint", &advtargetpoint);
-    tree->Branch("fChargeDivision", &chargedivpoint);
-    tree->Branch("fChargeDrift", &chargedriftpoint);
-    tree->Branch("fInducedCharge", &inducedchargepoint);
-    tree->Branch("fFEDResponse", &fedresponsepoint);
-
     return kSUCCESS;
 }
 
-void DigiTaskSND::Finish()
-{
-    ofile->Write(); 
-    ofile->Close();
-    //delete ofile;
-
-}
 
 void DigiTaskSND::Exec(Option_t* /*opt*/)
 {
@@ -265,18 +245,6 @@ void DigiTaskSND::digitiseAdvTarget()
         InducedChargePoint = new AdvSignal();
         FEDResponsePoint = new AdvSignal();
         new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points, dat, ChargeDivisionPoint, ChargeDriftPoint, InducedChargePoint, FEDResponsePoint);
-        event = event + 1; 
-        for (int m = 0; m < ChargeDivisionPoint->size(); m++)
-        {
-           size = points.size();
-           eventpoint = event; 
-           advtargetpoint = points[m];
-           chargedivpoint = (*ChargeDivisionPoint)[m]; 
-           chargedriftpoint = (*ChargeDriftPoint)[m];
-           inducedchargepoint = *InducedChargePoint;
-           fedresponsepoint = *FEDResponsePoint;
-           tree->Fill();
-        }
 
         auto point_map = mc_points[detector_id];
         for (const auto& [point_id, energy_loss] : point_map) {

@@ -56,10 +56,6 @@ AdvTargetHit::AdvTargetHit(Int_t detID, const std::vector<AdvTargetPoint*>& V, T
 
     size = V.size(); 
 
-    // for (int i =0; i < 769; i++)
-    // {
-    //     fResponseHit[i] = i; 
-    // }
 
     *ChargeDivisionPoint = EnergyLossVector;
     *ChargeDriftPoint = DiffusionSignal;  

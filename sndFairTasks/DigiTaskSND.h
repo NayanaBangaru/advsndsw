@@ -33,8 +33,6 @@ class DigiTaskSND : public FairTask
     /** Virtual method Init **/
     virtual InitStatus Init();
 
-    virtual void Finish();
-
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
 
@@ -86,10 +84,7 @@ class DigiTaskSND : public FairTask
     SurfaceSignal chargedriftpoint;
     AdvSignal inducedchargepoint;
     AdvSignal fedresponsepoint; 
-    
-
-    TTree* tree; 
-    TFile* ofile;
+   
 
     ClassDef(DigiTaskSND, 3);
 };
