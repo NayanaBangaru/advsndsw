@@ -319,7 +319,10 @@ static const Double_t kGasThreshold = 10. * mg / cm3;
 
 //
 static const Double_t universe_mean_density = 1.e-25 * g / cm3;
-
+//
+// specific SNDLHC constants
+static const Double_t snd_freq = 160.316*megahertz; // sndlhc clock
+static const Double_t snd_TDC2ns = 1./snd_freq;
 };   // namespace ShipUnit
 
 #endif   // SHIPDATA_SHIPUNIT_H_

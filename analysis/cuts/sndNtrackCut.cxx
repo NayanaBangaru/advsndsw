@@ -2,7 +2,7 @@
 
 #include "TROOT.h"
 
-#include <iostream>
+#include "FairLogger.h"
 
 namespace snd::analysis_cuts{
   nTrackCut::nTrackCut(int n_min, int n_max){
@@ -22,7 +22,7 @@ namespace snd::analysis_cuts{
 
     recoTracksCollection = dynamic_cast<TClonesArray*>(gROOT->GetListOfGlobals()->FindObject("sndRecoTracks"));
     if (!recoTracksCollection){
-      std::cout << "nTrackCut ERROR: Could not find sndRecoTracks" << std::endl;
+      LOG(FATAL) << "nTrackCut ERROR: Could not find sndRecoTracks";
     }
   };
   
