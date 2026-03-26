@@ -29,6 +29,11 @@
 #include <algorithm>   // std::sort
 #include <iostream>    // for operator<<, basic_ostream, endl
 #include <vector>      // std::vector
+#include <TNtuple.h>
+#include "digitisation/AdvSignal.h"
+#include "digitisation/EnergyFluctUnit.h"
+#include "digitisation/SurfaceSignal.h"
+#include <fstream>
 
 using namespace std;
 
@@ -141,6 +146,7 @@ InitStatus DigiTaskSND::Init()
     return kSUCCESS;
 }
 
+
 void DigiTaskSND::Exec(Option_t* /*opt*/)
 {
 
@@ -229,16 +235,24 @@ void DigiTaskSND::digitiseAdvTarget()
         mc_points[detector_id][point_index++] = point->GetEnergyLoss();
         norm[detector_id] += point->GetEnergyLoss();
     }
-
+    
+    event = 0; 
+    size = 0; 
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID sensor + strip)
-        new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points);
+        ChargeDivisionPoint = new std::vector<EnergyFluctUnit>();
+        ChargeDriftPoint = new std::vector<SurfaceSignal>();
+        InducedChargePoint = new AdvSignal();
+        FEDResponsePoint = new AdvSignal();
+        new ((*AdvTargetHits)[hit_index++]) AdvTargetHit(detector_id, points, dat, ChargeDivisionPoint, ChargeDriftPoint, InducedChargePoint, FEDResponsePoint);
+
         auto point_map = mc_points[detector_id];
         for (const auto& [point_id, energy_loss] : point_map) {
             mc_links.Add(detector_id, point_id, energy_loss / norm[detector_id]);
         }
     }
     new ((*AdvTargetHits2MCPoints)[0]) Hit2MCPoints(mc_links);
+    
 }
 
 void DigiTaskSND::digitiseAdvMuFilter()

@@ -5,6 +5,11 @@
 #include "FairTask.h"            // for FairTask, InitStatus
 #include "SNDLHCEventHeader.h"   // for EventHeader
 #include "Scifi.h"               // for Scifi detector
+#include "TNtuple.h"
+#include "AdvTargetPoint.h"
+#include "digitisation/AdvSignal.h"
+#include "digitisation/EnergyFluctUnit.h"
+#include "digitisation/SurfaceSignal.h"
 
 #include <Rtypes.h>       // for THashConsistencyHolder, ClassDef
 #include <RtypesCore.h>   // for Double_t, Int_t, Option_t
@@ -63,6 +68,23 @@ class DigiTaskSND : public FairTask
     TClonesArray* fMCTrackArray;
     DigiTaskSND(const DigiTaskSND&);
     DigiTaskSND& operator=(const DigiTaskSND&);
+
+    TNtuple* dat;
+    AdvSignal FEDResponseSignal; 
+    std::vector<EnergyFluctUnit>* ChargeDivisionPoint;
+    std::vector<SurfaceSignal>* ChargeDriftPoint;
+    AdvSignal* InducedChargePoint;
+    AdvSignal* FEDResponsePoint; 
+
+    Int_t event; 
+    Int_t size;
+    Int_t eventpoint; 
+    AdvTargetPoint* advtargetpoint; 
+    EnergyFluctUnit chargedivpoint; 
+    SurfaceSignal chargedriftpoint;
+    AdvSignal inducedchargepoint;
+    AdvSignal fedresponsepoint; 
+   
 
     ClassDef(DigiTaskSND, 3);
 };

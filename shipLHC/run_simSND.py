@@ -14,8 +14,8 @@ simEngine    = "Pythia8"  # "Genie" # Ntuple
 inactivateMuonProcesses  = False
 
 MCTracksWithHitsOnly                  = False  # copy particles which produced a hit and their history
-MCTracksWithEnergyCutOnly    = True # copy particles above a certain kin energy cut
-MCTracksWithHitsOrEnergyCut = False # or of above, factor 2 file size increase compared to MCTracksWithEnergyCutOnly
+MCTracksWithEnergyCutOnly    = False # copy particles above a certain kin energy cut
+MCTracksWithHitsOrEnergyCut = True # or of above, factor 2 file size increase compared to MCTracksWithEnergyCutOnly
 
 parser = ArgumentParser()
 group = parser.add_mutually_exclusive_group()
