@@ -14,7 +14,7 @@ using namespace std;
 
 FrontendDriver::FrontendDriver() {}
 
-AdvSignal FrontendDriver::FEDResponse(AdvSignal Signal)
+AdvSignal FrontendDriver::FEDResponse(Int_t DetID, AdvSignal Signal)
 {
     AdvSignal ADCResponse = ADCConversion(Signal); 
 

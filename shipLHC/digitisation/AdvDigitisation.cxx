@@ -48,7 +48,7 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
 
     //FED Response 
     FrontendDriver frontenddriver{};
-    AdvSignal FEDResponseSignal = frontenddriver.FEDResponse(ResponseSignal);
+    AdvSignal FEDResponseSignal = frontenddriver.FEDResponse(detID, ResponseSignal);
 
     //Creating map of hit 
     std::map<std::string, std::vector<Int_t>> DigitisedHit; 
