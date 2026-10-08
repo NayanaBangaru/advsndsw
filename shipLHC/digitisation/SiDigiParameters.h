@@ -57,18 +57,21 @@ const Double_t noise_std_dev = 0.01;
 
         const bool NoiseOption = 0; 
         const bool CMNoiseOption = 0;
-        const bool ZSModeOption = 1; 
+        const bool ZSModeOption = 0; 
         const Int_t StripNoise = 1; 
         const Double_t NoiseRMS = 2; 
         const Double_t NoiseSigmaThreshold = 2; 
         const Double_t CMNoise = 2; 
 
+        const bool PedestalOption = 0; 
+        const Int_t StripPedestal = 250; 
+
         const Int_t NumberofStrips = 768;
         const Int_t ZeroSuppressionMode = 4; 
         const Int_t ZeroSuppressionMode1T = 2;
 
-        const std::string NoiseProfile= "tbmay_noiseprofile.txt"; 
-        const std::string PedestalProfile= "tbmay_pedestalprofile.txt";
+        const std::string NoiseProfile= "advsndsw/shipLHC/digitisation/tbmay_noiseprofile.txt"; 
+        const std::string PedestalProfile= "advsndsw/shipLHC/digitisation/tbmay_pedestalprofile.txt";
 
     }
 }   // namespace advsnd

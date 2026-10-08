@@ -21,8 +21,9 @@ Add Pedestals for each channel after calibration */
 StripNoise::StripNoise() {}
 
 std::map<int, int> StripNoise::noise_map;
+std::map<int, int> StripNoise::pedestal_map; 
 
-AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
+AdvSignal StripNoise::AddGaussianNoise(Int_t detID, AdvSignal Signal)
 {
     std::vector<Int_t> Strips = Signal.getStrips();
     std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
@@ -30,9 +31,21 @@ AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
     TRandom* rndm = gRandom;
     for (int i = 0; i < stripsensor::frontend::NumberofStrips; i++)
     {
-        Double_t x = rndm->Gaus(0, stripsensor::frontend::NoiseRMS);
-        Strips.push_back(i); 
-        Amplitude.push_back(x);
+        if (stripsensor::frontend::NoiseOption)
+        {
+            Double_t x = rndm->Gaus(0, stripsensor::frontend::NoiseRMS);
+            Strips.push_back(i); 
+            Amplitude.push_back(x);
+        }
+        else
+        {
+            Int_t current_detid = (((detID) & ~0x3FF) | i); 
+            Strips.push_back(i); 
+
+            Double_t x = rndm->Gaus(0, noise_map[current_detid]); 
+            Amplitude.push_back(x);
+        }
+
     }
     AdvSignal NoiseSignal(Strips, Amplitude); 
     return NoiseSignal; 
@@ -164,7 +177,6 @@ void StripNoise::CreateNoiseProfile()
         if ((getline(ss, key_str, ':')) && (getline(ss, value_str, ':'))){
             int key = stoi(key_str); 
             int value = stoi(value_str);
-
             noise_map[key] = value; 
         }
     }
@@ -176,12 +188,10 @@ void StripNoise::CreateNoiseProfile()
 void StripNoise::CreatePedestalProfile()
 {
 
-    map<int, int> pedestal_map; 
-
     ifstream pedestalavgfile(stripsensor::frontend::PedestalProfile); 
     if (!pedestalavgfile.is_open()) {
-        cout << "Noise Profile file doesn't exist!" << endl;
-        cout << "Using standard noise from SiDigiParameters.h" << endl; 
+        cout << "Pedestal Profile file doesn't exist!" << endl;
+        cout << "Using standard pedestal from SiDigiParameters.h" << endl; 
         return; 
     } 
     
@@ -199,7 +209,6 @@ void StripNoise::CreatePedestalProfile()
         if ((getline(ss, key_str, ':')) && (getline(ss, value_str, ':'))){
             int key = stoi(key_str); 
             int value = stoi(value_str);
-
             pedestal_map[key] = value; 
         }
     }

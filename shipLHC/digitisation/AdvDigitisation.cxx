@@ -52,6 +52,10 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
     {
         stripnoise.CreateNoiseProfile();
     }
+    if (!stripsensor::frontend::PedestalOption)
+    {
+        stripnoise.CreatePedestalProfile();
+    }
     //FED Response 
     FrontendDriver frontenddriver{};
     AdvSignal FEDResponseSignal = frontenddriver.FEDResponse(detID, ResponseSignal);

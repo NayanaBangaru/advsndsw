@@ -24,17 +24,16 @@ AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
     StripNoise stripnoise{}; 
     InducedCharge inducedcharge{}; 
     
-    if (stripsensor::frontend::ZSModeOption && stripsensor::frontend::NoiseOption)
+    if (stripsensor::frontend::ZSModeOption)
     {
         FEDResponseSignal = stripnoise.AddGaussianTailNoise(Signal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
         FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
-        std::cout << " ============ " << StripNoise::noise_map[0] << " ========= " << std::endl; 
     }
     if (!stripsensor::frontend::ZSModeOption)
     {
-        FEDResponseSignal = stripnoise.AddGaussianNoise(Signal);
+        FEDResponseSignal = stripnoise.AddGaussianNoise(detID, Signal);
         FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
