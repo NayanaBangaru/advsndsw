@@ -40,7 +40,7 @@ AdvHit::AdvHit(Int_t detID)
 
 // -----   constructor from AdvPoint   ------------------------------------------
 AdvHit::AdvHit(Int_t detID, const std::vector<AdvPoint*>& V)
-{
+{ 
     fDetectorID = detID;
     AdvDigitisation advdigi{};
     fDigitisedHit = advdigi.digirunoutput(detID, V);

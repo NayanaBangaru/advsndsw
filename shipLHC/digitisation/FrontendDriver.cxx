@@ -14,7 +14,7 @@ using namespace std;
 
 FrontendDriver::FrontendDriver() {}
 
-AdvSignal FrontendDriver::FEDResponse(AdvSignal Signal)
+AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
 {
     AdvSignal ADCResponse = ADCConversion(Signal); 
 
@@ -30,6 +30,7 @@ AdvSignal FrontendDriver::FEDResponse(AdvSignal Signal)
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
         FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
+        std::cout << " ============ " << StripNoise::noise_map[0] << " ========= " << std::endl; 
     }
     if (!stripsensor::frontend::ZSModeOption)
     {

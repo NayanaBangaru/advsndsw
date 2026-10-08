@@ -9,13 +9,18 @@
 #include <fstream>
 #include <algorithm>
 #include <cmath>
+#include <map>
+#include <bits/stdc++.h>
 using namespace std;
 
 /* To Do : 
 Add Baseline Shift?
 Add Pedestals for each channel after calibration */
 
+
 StripNoise::StripNoise() {}
+
+std::map<int, int> StripNoise::noise_map;
 
 AdvSignal StripNoise::AddGaussianNoise(AdvSignal Signal)
 {
@@ -129,4 +134,76 @@ double StripNoise::generate_gaussian_tail(const double a,const double sigma)
         } while (x * u > s);
         return x * sigma;
     }
+}
+
+void StripNoise::CreateNoiseProfile()
+{
+
+    //map<int, int> noise_map; 
+
+    
+
+    ifstream noiseavgfile(stripsensor::frontend::NoiseProfile); 
+    if (!noiseavgfile.is_open()) {
+        cout << "Noise Profile file doesn't exist!" << endl;
+        cout << "Using standard noise from SiDigiParameters.h" << endl; 
+        return; 
+    } 
+    
+    std::string line ; 
+
+    while(getline(noiseavgfile, line))
+
+    {
+        if (line.empty()) continue; 
+
+        stringstream ss(line);
+
+        string key_str, value_str;
+
+        if ((getline(ss, key_str, ':')) && (getline(ss, value_str, ':'))){
+            int key = stoi(key_str); 
+            int value = stoi(value_str);
+
+            noise_map[key] = value; 
+        }
+    }
+
+    noiseavgfile.close();
+}
+
+
+void StripNoise::CreatePedestalProfile()
+{
+
+    map<int, int> pedestal_map; 
+
+    ifstream pedestalavgfile(stripsensor::frontend::PedestalProfile); 
+    if (!pedestalavgfile.is_open()) {
+        cout << "Noise Profile file doesn't exist!" << endl;
+        cout << "Using standard noise from SiDigiParameters.h" << endl; 
+        return; 
+    } 
+    
+    std::string line ; 
+
+    while(getline(pedestalavgfile, line))
+
+    {
+        if (line.empty()) continue; 
+
+        stringstream ss(line);
+
+        string key_str, value_str;
+
+        if ((getline(ss, key_str, ':')) && (getline(ss, value_str, ':'))){
+            int key = stoi(key_str); 
+            int value = stoi(value_str);
+
+            pedestal_map[key] = value; 
+        }
+    }
+
+    pedestalavgfile.close();     
+
 }
