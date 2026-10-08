@@ -67,8 +67,8 @@ const Double_t noise_std_dev = 0.01;
         const Int_t ZeroSuppressionMode = 4; 
         const Int_t ZeroSuppressionMode1T = 2;
 
-        const std::string NoiseProfile= "/eos/experiment/sndlhc/users/nbangaru/AdvSND/station_testing/testbeam/convert_clones/include/tbmay_noiseprofile.txt"; 
-        const std::string PedestalProfile= "/eos/experiment/sndlhc/users/nbangaru/AdvSND/station_testing/testbeam/convert_clones/include/tbmay_noiseprofile.txt";
+        const std::string NoiseProfile= "tbmay_noiseprofile.txt"; 
+        const std::string PedestalProfile= "tbmay_pedestalprofile.txt";
 
     }
 }   // namespace advsnd
