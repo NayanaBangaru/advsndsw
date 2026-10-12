@@ -29,14 +29,19 @@ AdvHit::AdvHit()
     signal = -999;
     time = -999;
 }
+
 // -----   Standard constructor   ------------------------------------------
 AdvHit::AdvHit(Int_t detID)
   :TObject(),
    fDetectorID(detID)
 {
     flag = true;
-    signal = -999;
-    time = -999;
+    // signal = -999;
+    // time = -999;
+    AdvDigitisation advdigi{}; 
+    fDigitisedHit = advdigi.digirunoutput(detID); 
+    LOG(DEBUG) << "noise and pedestal added"; 
+
 }
 
 // -----   constructor from AdvPoint   ------------------------------------------

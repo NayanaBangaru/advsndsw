@@ -23,7 +23,7 @@ StripNoise::StripNoise() {}
 std::map<int, int> StripNoise::noise_map;
 std::map<int, std::vector<int>> StripNoise::pedestal_map; 
 
-AdvSignal StripNoise::AddGaussianNoise(Int_t detID, AdvSignal Signal)
+AdvSignal StripNoise::AddGaussianNoise(Int_t detID)
 {
     std::vector<Int_t> Strips;
     std::vector<Double_t> Amplitude;
@@ -51,7 +51,7 @@ AdvSignal StripNoise::AddGaussianNoise(Int_t detID, AdvSignal Signal)
     return NoiseSignal; 
 }
 
-AdvSignal StripNoise::AddPedestals(Int_t detID, AdvSignal Signal)
+std::vector<Int_t> StripNoise::CreateDetIDs()
 {
     std::vector<Int_t> detids; 
     TString path = TString::Format("/cave_1/"
@@ -99,9 +99,13 @@ AdvSignal StripNoise::AddPedestals(Int_t detID, AdvSignal Signal)
     } else {
         std::cout << " ====== PATH DOES NOT EXIST  ====== " << path << std::endl; 
     }
+    return detids; 
+}
 
-    std::vector<Int_t> Strips = Signal.getStrips();
-    std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
+AdvSignal StripNoise::AddPedestals(Int_t detID)
+{
+    std::vector<Int_t> Strips;
+    std::vector<Double_t> Amplitude;
 
     TRandom* rndm = gRandom;
     for (int i = 0; i < stripsensor::frontend::NumberofStrips; i++)
@@ -110,7 +114,7 @@ AdvSignal StripNoise::AddPedestals(Int_t detID, AdvSignal Signal)
         {
             Double_t x = rndm->Gaus(0, stripsensor::frontend::StripPedestal);
             //Strips.push_back(i); 
-            Amplitude[i] = Amplitude[i] + x;
+            Amplitude[i] = x;
         }
         else
         {
@@ -128,7 +132,8 @@ AdvSignal StripNoise::AddPedestals(Int_t detID, AdvSignal Signal)
             { 
             x = rndm->Gaus(pedestal_map[current_detid][0], pedestal_map[current_detid][1]); 
             }
-            Amplitude[i] = Amplitude[i] + x;
+            Strips[i] = i; 
+            Amplitude[i] = x;
         }        
 
     }

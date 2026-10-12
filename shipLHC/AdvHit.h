@@ -6,6 +6,7 @@
 #include "SiSensor.h"
 #include "digitisation/AdvSignal.h"
 #include <map>
+#include <vector>
 
 #ifndef __CINT__
 #include <boost/serialization/access.hpp>
@@ -19,6 +20,7 @@ class AdvHit : public TObject
   public:
     /** Default constructor **/
     AdvHit();
+    
     explicit AdvHit(Int_t detID);
 
     // Constructor from AdvPoint

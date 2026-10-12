@@ -11,6 +11,7 @@ class FrontendDriver
 {
   public:
     FrontendDriver();
+    AdvSignal FEDResponse(Int_t detID);
     AdvSignal FEDResponse(Int_t detID, AdvSignal Signal);
     // AdvSignal ADCConversion(AdvSignal ResponseSignal);
     AdvSignal SaturateRange(AdvSignal Signal);

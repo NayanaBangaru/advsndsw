@@ -20,6 +20,8 @@
 #include "TGeoNavigator.h"
 #include "sndScifiHit.h"   // for SciFi Hit
 
+#include "StripNoise.h"
+
 #include <TClonesArray.h>   // or TClonesArray
 #include <TFile.h>
 #include <TGenericClassInfo.h>   // for TGenericClassInfo
@@ -249,8 +251,23 @@ void DigiTaskSND::digitiseAdvTarget()
         mc_points[detector_id][point_index++] = point->GetEnergyLoss();
         norm[detector_id] += point->GetEnergyLoss();
     }
+
+
+    std::vector<Int_t> extra_detids;
+    StripNoise stripnoise;  
+    extra_detids = stripnoise.CreateDetIDs(); 
+
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID module + strip)
+        auto it = std::find(extra_detids.begin(),
+                            extra_detids.end(),
+                            detector_id);
+
+        if (it != extra_detids.end())
+        {
+            extra_detids.erase(it);
+        }
+
         AdvHit* aHit = new ((*AdvTargetHits)[hit_index++]) AdvHit(detector_id, points);
         module_collector[module_map[detector_id]].emplace_back(aHit);
         auto point_map = mc_points[detector_id];
@@ -259,6 +276,13 @@ void DigiTaskSND::digitiseAdvTarget()
         }
 
     }
+
+    for (const auto detector_id : extra_detids)
+    {
+        AdvHit* aHit = new ((*AdvTargetHits)[hit_index++]) AdvHit(detector_id);
+        module_collector[module_map[detector_id]].emplace_back(aHit);
+    }
+    
     new ((*AdvTargetHits2MCPoints)[0]) Hit2MCPoints(mc_links);
 
     // Loop over hits in an unique module and sum the charges per unique strip

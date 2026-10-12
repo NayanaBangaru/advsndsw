@@ -14,6 +14,21 @@ using namespace std;
 
 FrontendDriver::FrontendDriver() {}
 
+AdvSignal FrontendDriver::FEDResponse(Int_t detID)
+{
+    std::vector<AdvSignal> temp_FEDResponseSignal;
+
+    StripNoise stripnoise{}; 
+    InducedCharge inducedcharge{}; 
+
+    AdvSignal noisesignal = stripnoise.AddGaussianNoise(detID);
+    AdvSignal pedestalsignal = stripnoise.AddPedestals(detID); 
+    temp_FEDResponseSignal.push_back(noisesignal); 
+    temp_FEDResponseSignal.push_back(pedestalsignal); 
+    AdvSignal FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
+    return FEDResponseSignal; 
+}
+
 AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
 {
     // /dvSignal ADCResponse = ADCConversion(Signal); 
@@ -33,8 +48,8 @@ AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
     }
     if (!stripsensor::frontend::ZSModeOption)
     {
-        FEDResponseSignal = stripnoise.AddGaussianNoise(detID, Signal);
-        FEDResponseSignal = stripnoise.AddPedestals(detID, FEDResponseSignal); 
+        FEDResponseSignal = stripnoise.AddGaussianNoise(detID);
+        //FEDResponseSignal = stripnoise.AddPedestals(detID, FEDResponseSignal); 
         //FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
         temp_FEDResponseSignal.push_back(Signal); 
