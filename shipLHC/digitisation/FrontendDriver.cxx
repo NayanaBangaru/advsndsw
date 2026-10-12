@@ -16,7 +16,7 @@ FrontendDriver::FrontendDriver() {}
 
 AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
 {
-    AdvSignal ADCResponse = ADCConversion(Signal); 
+    // /dvSignal ADCResponse = ADCConversion(Signal); 
 
     AdvSignal FEDResponseSignal ; 
     std::vector<AdvSignal> temp_FEDResponseSignal;
@@ -34,26 +34,28 @@ AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
     if (!stripsensor::frontend::ZSModeOption)
     {
         FEDResponseSignal = stripnoise.AddGaussianNoise(detID, Signal);
-        FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
+        FEDResponseSignal = stripnoise.AddPedestals(detID, FEDResponseSignal); 
+        //FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
+        temp_FEDResponseSignal.push_back(Signal); 
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
     }
     FEDResponseSignal = SaturateRange(FEDResponseSignal);
     return FEDResponseSignal;
 }
 
-AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
-{
-        std::vector<Double_t> NumberofElectrons = ResponseSignal.getIntegratedSignal();
-        for (int i = 0; i < NumberofElectrons.size(); i++)
-        {
-            ADCcount.push_back(stripsensor::frontend::StripNoise + std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC));
-        }
+// AdvSignal FrontendDriver::ADCConversion(AdvSignal ResponseSignal)
+// {
+//         std::vector<Double_t> NumberofElectrons = ResponseSignal.getIntegratedSignal();
+//         for (int i = 0; i < NumberofElectrons.size(); i++)
+//         {
+//             ADCcount.push_back(stripsensor::frontend::StripNoise + std::ceil(NumberofElectrons[i]/stripsensor::frontend::ElectronperADC));
+//         }
 
-        AdvSignal ADCResponse(ResponseSignal.getStrips(), ADCcount);
+//         AdvSignal ADCResponse(ResponseSignal.getStrips(), ADCcount);
 
-        return ADCResponse; 
-}
+//         return ADCResponse; 
+// }
 
 AdvSignal FrontendDriver::SaturateRange(AdvSignal Signal)
 {

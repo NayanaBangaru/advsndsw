@@ -7,6 +7,7 @@
 #include "TVector3.h"
 #include "digitisation/AdvSignal.h"
 #include <map>
+#include <vector>
 
 class AdvTargetPoint;
 

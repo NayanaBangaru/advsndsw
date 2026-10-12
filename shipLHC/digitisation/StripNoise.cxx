@@ -2,7 +2,7 @@
 #include "SiDigiParameters.h"
 #include "AdvSignal.h"
 #include "TRandom.h"
-
+#include "TGeoManager.h"
 
 #include <iostream>
 #include <vector>
@@ -21,12 +21,12 @@ Add Pedestals for each channel after calibration */
 StripNoise::StripNoise() {}
 
 std::map<int, int> StripNoise::noise_map;
-std::map<int, int> StripNoise::pedestal_map; 
+std::map<int, std::vector<int>> StripNoise::pedestal_map; 
 
 AdvSignal StripNoise::AddGaussianNoise(Int_t detID, AdvSignal Signal)
 {
-    std::vector<Int_t> Strips = Signal.getStrips();
-    std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
+    std::vector<Int_t> Strips;
+    std::vector<Double_t> Amplitude;
 
     TRandom* rndm = gRandom;
     for (int i = 0; i < stripsensor::frontend::NumberofStrips; i++)
@@ -49,6 +49,91 @@ AdvSignal StripNoise::AddGaussianNoise(Int_t detID, AdvSignal Signal)
     }
     AdvSignal NoiseSignal(Strips, Amplitude); 
     return NoiseSignal; 
+}
+
+AdvSignal StripNoise::AddPedestals(Int_t detID, AdvSignal Signal)
+{
+    std::vector<Int_t> detids; 
+    TString path = TString::Format("/cave_1/"
+                                   "Detector_0/"
+                                   "volAdvTarget_0/");
+    TGeoNavigator *nav = gGeoManager->GetCurrentNavigator();
+    if (nav->CheckPath(path)) {
+        nav->cd(path);
+        
+        TGeoNode *currentnode = nav->GetCurrentNode();
+
+        int nDaughters = currentnode->GetNdaughters();
+
+        for (int n = 0; n < nDaughters; n++)
+        {
+            TGeoNode* currentdaughternode = currentnode -> GetDaughter(n); 
+            string name = currentdaughternode->GetName(); 
+            int start_index = name.find("Target_Layer_"); 
+
+
+            if (start_index == 0){
+                int layer = stoi(name.erase(0,13));
+                TGeoNode* currentsensornode = currentdaughternode->GetDaughter(0); 
+                string sensorname = currentsensornode->GetName(); 
+                
+                int start_sensor_row_index = sensorname.find("Row_"); 
+                int start_sensor_column_index = sensorname.find("Column_"); 
+                
+                int row = stoi(sensorname.substr(4 + start_sensor_row_index, 1));
+                int column = stoi(sensorname.substr(7 + start_sensor_column_index, 1)); 
+
+                int strip = 0; 
+
+                int detid = ((layer )   << 13)
+                            | ((row     & 0x3)   << 11)
+                            | ((column  & 0x1)   << 10)
+                            |  (strip   & 0x3FF);
+
+                detids.push_back(detid);
+
+            } 
+            
+        }
+
+    } else {
+        std::cout << " ====== PATH DOES NOT EXIST  ====== " << path << std::endl; 
+    }
+
+    std::vector<Int_t> Strips = Signal.getStrips();
+    std::vector<Double_t> Amplitude = Signal.getIntegratedSignal();
+
+    TRandom* rndm = gRandom;
+    for (int i = 0; i < stripsensor::frontend::NumberofStrips; i++)
+    {
+        if (stripsensor::frontend::PedestalOption)
+        {
+            Double_t x = rndm->Gaus(0, stripsensor::frontend::StripPedestal);
+            //Strips.push_back(i); 
+            Amplitude[i] = Amplitude[i] + x;
+        }
+        else
+        {
+            Int_t current_detid = (((detID) & ~0x3FF) | i); 
+
+            Double_t x ; 
+        
+            if (pedestal_map[current_detid].size() ==0)
+            {
+                std::cout << "No entry for detector " << current_detid << ". Equating to zero. " << std::endl; 
+
+                x = 0; 
+            }
+            else 
+            { 
+            x = rndm->Gaus(pedestal_map[current_detid][0], pedestal_map[current_detid][1]); 
+            }
+            Amplitude[i] = Amplitude[i] + x;
+        }        
+
+    }
+    AdvSignal PedestalSignal(Strips, Amplitude); 
+    return PedestalSignal; 
 }
 
 AdvSignal StripNoise::AddGaussianTailNoise(AdvSignal Signal)
@@ -204,12 +289,15 @@ void StripNoise::CreatePedestalProfile()
 
         stringstream ss(line);
 
-        string key_str, value_str;
+        string key_str, value_str, error_str;
 
-        if ((getline(ss, key_str, ':')) && (getline(ss, value_str, ':'))){
+        if ((getline(ss, key_str, ':')) && (getline(ss, value_str, ':')) && (getline(ss, error_str, ':'))){
             int key = stoi(key_str); 
             int value = stoi(value_str);
-            pedestal_map[key] = value; 
+            int error = stoi(error_str);
+            //std::cout << key << "\t" << " ==== " << value << "\t" << " ==== " << error << std::endl; 
+            pedestal_map[key].push_back(value);
+            pedestal_map[key].push_back(error); 
         }
     }
 

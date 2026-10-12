@@ -13,9 +13,10 @@ class StripNoise
     StripNoise();
 
     static std::map<int, int> noise_map;
-    static std::map<int, int> pedestal_map; 
+    static std::map<int, std::vector<int>> pedestal_map; 
      
     AdvSignal AddGaussianNoise(Int_t detID, AdvSignal Signal);
+    AdvSignal AddPedestals(Int_t detID, AdvSignal Signal);
     AdvSignal AddGaussianTailNoise(AdvSignal Signal);
     AdvSignal AddCMNoise(AdvSignal Signal);
     double generate_gaussian_tail(const double a, const double sigma); 

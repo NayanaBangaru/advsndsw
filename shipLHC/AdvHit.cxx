@@ -16,6 +16,7 @@
 #include <typeinfo>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <map>
 using std::cout;
 using std::endl;
