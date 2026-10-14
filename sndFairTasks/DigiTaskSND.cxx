@@ -21,6 +21,8 @@
 #include "sndScifiHit.h"   // for SciFi Hit
 
 #include "StripNoise.h"
+#include "SiDigiParameters.h"
+#include <typeinfo>
 
 #include <TClonesArray.h>   // or TClonesArray
 #include <TFile.h>
@@ -252,10 +254,17 @@ void DigiTaskSND::digitiseAdvTarget()
         norm[detector_id] += point->GetEnergyLoss();
     }
 
-
     std::vector<Int_t> extra_detids;
     StripNoise stripnoise;  
     extra_detids = stripnoise.CreateDetIDs(); 
+    if (!stripsensor::frontend::NoiseOption)
+    {
+        stripnoise.CreateNoiseProfile();
+    }
+    if (!stripsensor::frontend::PedestalOption)
+    {
+        stripnoise.CreatePedestalProfile();
+    }
 
     for (const auto& [detector_id, points] : hit_collector) {
         // Make one hit per virtual strip (detector ID module + strip)
@@ -267,7 +276,6 @@ void DigiTaskSND::digitiseAdvTarget()
         {
             extra_detids.erase(it);
         }
-
         AdvHit* aHit = new ((*AdvTargetHits)[hit_index++]) AdvHit(detector_id, points);
         module_collector[module_map[detector_id]].emplace_back(aHit);
         auto point_map = mc_points[detector_id];
@@ -277,11 +285,19 @@ void DigiTaskSND::digitiseAdvTarget()
 
     }
 
-    for (const auto detector_id : extra_detids)
-    {
-        AdvHit* aHit = new ((*AdvTargetHits)[hit_index++]) AdvHit(detector_id);
-        module_collector[module_map[detector_id]].emplace_back(aHit);
-    }
+    // for (const auto detector_id : extra_detids)
+    // {
+    //     module_map[detector_id] = detector_id;
+
+    //     AdvHit* aHit = new ((*AdvTargetHits)[hit_index++])
+    //         AdvHit(detector_id, 2);
+
+    //     module_collector[module_map[detector_id]].emplace_back(aHit);
+
+    //     mc_links.Add(detector_id, -3, -3);
+    // }
+
+
     
     new ((*AdvTargetHits2MCPoints)[0]) Hit2MCPoints(mc_links);
 
@@ -296,7 +312,8 @@ void DigiTaskSND::digitiseAdvTarget()
         auto fDigitisedHit = aHit->GetHit();
         for(int a =0; a<fDigitisedHit["Strips"].size(); a++)
         {
-          sum_adc[fDigitisedHit["Strips"][a]] += fDigitisedHit["ADC"][a];
+          std::cout << aHit->GetLayer() << "\t" << aHit->GetRow() << "\t" << aHit->GetColumn() << "\t" << aHit->GetStrip() << "\t" << fDigitisedHit["Strips"][a]; 
+          sum_adc[fDigitisedHit["Strips"][a]] += fDigitisedHit["ADC"][a];  
         }
       }// end loop over hits in the same module.
       // At this stage one has the total changer per strip in a module.
@@ -305,9 +322,14 @@ void DigiTaskSND::digitiseAdvTarget()
       for (auto* ptr : digihits)
       {
         auto* aHit = dynamic_cast<AdvHit*>(ptr);
-        int strip = aHit->GetStrip();
-        aHit->SetSignal(Saturate(sum_adc[strip]));
-        existing_hit.push_back(strip);
+        //int strip = aHit->GetStrip();
+        auto fDigitisedHit = aHit->GetHit();
+        for(int a =0; a<fDigitisedHit["Strips"].size(); a++)
+        {
+            int strip = fDigitisedHit["Strips"][a];
+            aHit->SetSignal(Saturate(sum_adc[strip]));
+            existing_hit.push_back(strip);
+        }
       }
       // Add new hits for all strips that have "non-zero" charge, but were not intersected by a particle
       // meaning one now adds noise hits.
@@ -319,8 +341,8 @@ void DigiTaskSND::digitiseAdvTarget()
         if (count(existing_hit.begin(), existing_hit.end(), i)) continue;
         else
         {
-          auto detector_id = detID - 999 + i;
-          AdvHit* aHit = new ((*AdvTargetHits)[hit_index++]) AdvHit(detector_id);
+          auto detector_id = detID;
+          AdvHit* aHit = new ((*AdvTargetHits)[hit_index++]) AdvHit(detector_id,2);
           aHit->SetSignal(Saturate(sum_adc[i]));
         }
       }

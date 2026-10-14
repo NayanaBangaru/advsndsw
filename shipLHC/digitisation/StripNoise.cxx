@@ -41,11 +41,17 @@ AdvSignal StripNoise::AddGaussianNoise(Int_t detID)
         {
             Int_t current_detid = (((detID) & ~0x3FF) | i); 
             Strips.push_back(i); 
-
-            Double_t x = rndm->Gaus(0, noise_map[current_detid]); 
-            Amplitude.push_back(x);
+            if (noise_map[current_detid])
+            {
+                Double_t x = rndm->Gaus(0, noise_map[current_detid]); 
+                Amplitude.push_back(x);        
+            }
+            else 
+            {
+                //std::cout << "Module not in noise file !" << std::endl; 
+                Amplitude.push_back(0); 
+            }
         }
-
     }
     AdvSignal NoiseSignal(Strips, Amplitude); 
     return NoiseSignal; 
@@ -92,6 +98,8 @@ std::vector<Int_t> StripNoise::CreateDetIDs()
 
                 detids.push_back(detid);
 
+                if(detid < 0){std::cout << "the creation : " << detid << std::endl; }
+
             } 
             
         }
@@ -104,16 +112,15 @@ std::vector<Int_t> StripNoise::CreateDetIDs()
 
 AdvSignal StripNoise::AddPedestals(Int_t detID)
 {
-    std::vector<Int_t> Strips;
-    std::vector<Double_t> Amplitude;
-
+    std::vector<Int_t> Strips(stripsensor::frontend::NumberofStrips);
+    std::vector<Double_t> Amplitude(stripsensor::frontend::NumberofStrips);
     TRandom* rndm = gRandom;
     for (int i = 0; i < stripsensor::frontend::NumberofStrips; i++)
     {
         if (stripsensor::frontend::PedestalOption)
         {
             Double_t x = rndm->Gaus(0, stripsensor::frontend::StripPedestal);
-            //Strips.push_back(i); 
+            Strips[i] = i; 
             Amplitude[i] = x;
         }
         else
@@ -124,16 +131,17 @@ AdvSignal StripNoise::AddPedestals(Int_t detID)
         
             if (pedestal_map[current_detid].size() ==0)
             {
-                std::cout << "No entry for detector " << current_detid << ". Equating to zero. " << std::endl; 
-
                 x = 0; 
+                            Strips[i] = i; 
+            Amplitude[i] = x;
             }
             else 
             { 
-            x = rndm->Gaus(pedestal_map[current_detid][0], pedestal_map[current_detid][1]); 
-            }
-            Strips[i] = i; 
+                x = rndm->Gaus(pedestal_map[current_detid][0], pedestal_map[current_detid][1]); 
+                            Strips[i] = i; 
             Amplitude[i] = x;
+            }
+
         }        
 
     }

@@ -24,6 +24,9 @@ class AdvHit : public TObject
     explicit AdvHit(Int_t detID);
 
     // Constructor from AdvPoint
+
+    AdvHit(Int_t detID, Int_t test);
+
     AdvHit(Int_t detID, const std::vector<AdvPoint*>&);
 
     /** Destructor **/

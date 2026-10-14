@@ -48,7 +48,6 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
         });
     DigitisedHit["Strips"] = Strips; 
     DigitisedHit["ADC"] = ADC; 
-    
     return DigitisedHit;
 
 }
@@ -67,16 +66,6 @@ std::map<std::string, std::vector<Int_t>> AdvDigitisation::digirunoutput(Int_t d
     InducedCharge inducedcharge{};
     AdvSignal ResponseSignal = inducedcharge.IntegrateCharge(DiffusionSignal);
 
-    // map<int, int> noise_map; 
-    StripNoise stripnoise{}; 
-    if (!stripsensor::frontend::NoiseOption)
-    {
-        stripnoise.CreateNoiseProfile();
-    }
-    if (!stripsensor::frontend::PedestalOption)
-    {
-        stripnoise.CreatePedestalProfile();
-    }
     //FED Response 
     FrontendDriver frontenddriver{};
     AdvSignal FEDResponseSignal = frontenddriver.FEDResponse(detID, ResponseSignal);

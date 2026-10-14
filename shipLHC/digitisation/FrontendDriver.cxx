@@ -26,6 +26,8 @@ AdvSignal FrontendDriver::FEDResponse(Int_t detID)
     temp_FEDResponseSignal.push_back(noisesignal); 
     temp_FEDResponseSignal.push_back(pedestalsignal); 
     AdvSignal FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
+    FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
+    FEDResponseSignal = SaturateRange(FEDResponseSignal);
     return FEDResponseSignal; 
 }
 
@@ -49,11 +51,13 @@ AdvSignal FrontendDriver::FEDResponse(Int_t detID, AdvSignal Signal)
     if (!stripsensor::frontend::ZSModeOption)
     {
         FEDResponseSignal = stripnoise.AddGaussianNoise(detID);
-        //FEDResponseSignal = stripnoise.AddPedestals(detID, FEDResponseSignal); 
+        AdvSignal pedestalsignal = stripnoise.AddPedestals(detID); 
         //FEDResponseSignal = stripnoise.AddCMNoise(FEDResponseSignal); 
         temp_FEDResponseSignal.push_back(FEDResponseSignal);
+        temp_FEDResponseSignal.push_back(pedestalsignal);
         temp_FEDResponseSignal.push_back(Signal); 
         FEDResponseSignal = inducedcharge.Combine(temp_FEDResponseSignal); 
+        FEDResponseSignal = ZeroSuppressionAlgorithms(FEDResponseSignal);
     }
     FEDResponseSignal = SaturateRange(FEDResponseSignal);
     return FEDResponseSignal;

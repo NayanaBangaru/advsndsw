@@ -36,10 +36,27 @@ AdvHit::AdvHit(Int_t detID)
    fDetectorID(detID)
 {
     flag = true;
+    //if(detID < 0){std::cout << detID << std::endl; }
+    signal = -999;
+    time = -999;
+    // AdvDigitisation advdigi{}; 
+    // fDigitisedHit = advdigi.digirunoutput(detID); 
+    // //if(detID < 0){std::cout << "end : " << detID << std::endl; }
+    // LOG(DEBUG) << "noise and pedestal added"; 
+
+}
+
+AdvHit::AdvHit(Int_t detID, Int_t test)
+{
+    fDetectorID = detID;
+    flag = true;
+    if(detID < 0){std::cout << detID << std::endl; }
     // signal = -999;
     // time = -999;
     AdvDigitisation advdigi{}; 
     fDigitisedHit = advdigi.digirunoutput(detID); 
+    if(detID < 0){std::cout << detID << std::endl; }
+    //if(detID < 0){std::cout << "end : " << detID << std::endl; }
     LOG(DEBUG) << "noise and pedestal added"; 
 
 }
