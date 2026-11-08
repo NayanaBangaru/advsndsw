@@ -64,8 +64,8 @@ namespace frontend{
     const Int_t Pedestal = 250; 
     const Int_t hthr = 5; // value that fed uses for zero suppression 
     const Int_t lthr = 2; // value that fed uses for zero suppression 
-    const std::string NoiseProfile = "advsndsw/shipLHC/digitisation/tbmay_noiseprofile.csv";
-    const std::string PedestalProfile = "advsndsw/shipLHC/digitisation/tbmay_pedestalprofile.csv";
+    const std::string NoiseProfile = "/afs/cern.ch/work/n/nbangaru/public/advsndsw/shipLHC/digitisation/tbmay_noiseprofile.csv";
+    const std::string PedestalProfile = "/afs/cern.ch/work/n/nbangaru/public/advsndsw/shipLHC/digitisation/tbmay_pedestalprofile.csv";
     const Double_t CMNoise = 2; 
     const Int_t NumberofStrips = 768;
     const Int_t ZeroSuppressionMode = 4; 
