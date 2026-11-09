@@ -43,6 +43,8 @@ AdvSignal InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSig
 
         Double_t e = 1.6e-19; 
 
+        double pitch = advsnd::sensor_length / advsnd::strips; 
+
         for (int i = 0; i < surfacepos.size(); i++)
         {
         //Getting the strips that would see the charge for each energy segment 
@@ -53,8 +55,8 @@ AdvSignal InducedCharge::IntegrateCharge(std::vector<SurfaceSignal> DiffusionSig
 
             for(int j = 0; j < AffectedStrips.size(); j++)
             {
-                y_start = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_length / advsnd::strips) - (stripsensor::inducedcharge::strip_pitch / 2);
-                y_end = (AffectedStrips[j] - (advsnd::strips / 2))*(advsnd::sensor_length / advsnd::strips) + (stripsensor::inducedcharge::strip_pitch / 2);
+                y_start = (AffectedStrips[j] - (advsnd::strips / 2))*pitch;
+                y_end = (AffectedStrips[j] + (1 - (advsnd::strips / 2)))*pitch;
                 z_start = (y_start - surfacepos[i].Y()) / diffusionarea[j];
                 z_end = abs(y_end - surfacepos[i].Y()) / diffusionarea[j];
                 integratedcharge = (erf((z_end) / TMath::Sqrt2()) / 2) - (erf((z_start) / TMath::Sqrt2()) / 2);

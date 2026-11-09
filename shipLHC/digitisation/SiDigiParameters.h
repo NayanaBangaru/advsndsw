@@ -24,7 +24,7 @@ const Double_t noise_std_dev = 0.01;
 
 namespace chargedivision{
     const Int_t ChargeDivisionsperStrip = 10; // Number of divisions of the track length per strip 
-    const float StripPitch = 120e-4; // Strip pitch of the detector 
+    const float StripPitch = 122e-4; // Strip pitch of the detector 
 }
 
 namespace drift{
@@ -41,8 +41,6 @@ namespace drift{
 
 namespace inducedcharge{
     const Int_t NSigma = 3; 
-    const Double_t strip_width = 30e-4; //in cm  
-    const Double_t strip_pitch = 120e-4; //in cm 
     const bool Coupling = 0; 
     const std::vector<Double_t> CouplingConstants = {0.964, 0.018};
 }
