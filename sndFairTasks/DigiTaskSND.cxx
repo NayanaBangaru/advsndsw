@@ -153,8 +153,6 @@ InitStatus DigiTaskSND::Init()
         stripnoise.CreatePedestalProfile();
     }
 
-    stripnoise.CreateDetIDs(); 
-
     if(AdvTargetPoints) {
       AdvTargetHits = new TClonesArray("AdvHit");
       ioman->Register("Digi_AdvTargetHits", "DigiAdvTargetHit_det", AdvTargetHits, kTRUE);
@@ -268,6 +266,8 @@ void DigiTaskSND::digitiseAdvTarget()
         mc_points[detector_id][point_index++] = point->GetEnergyLoss();
         norm[detector_id] += point->GetEnergyLoss();
     }
+    StripNoise stripnoise;
+    stripnoise.CreateDetIDs(); 
     for (const auto& [detector_id, points] : hit_collector) {
 
         int module_detid = ((detector_id & ~0x3FF) | (0 & 0x3FF));
