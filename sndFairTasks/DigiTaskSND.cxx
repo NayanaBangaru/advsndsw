@@ -24,6 +24,7 @@
 #include "digitisation/AdvDigitisation.h"
 
 #include <TClonesArray.h>   // or TClonesArray
+#include <TObjString.h>
 #include <TFile.h>
 #include <TGenericClassInfo.h>   // for TGenericClassInfo
 #include <TMath.h>               // for Sqrt
@@ -33,6 +34,8 @@
 #include <iostream>    // for operator<<, basic_ostream, endl
 #include <vector>      // std::vector
 #include <map>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -154,6 +157,8 @@ InitStatus DigiTaskSND::Init()
     }
 
     if(AdvTargetPoints) {
+      //TObjString* cfg = new TObjString("[NAYANA] : Testing");
+      WriteConfig(); 
       AdvTargetHits = new TClonesArray("AdvHit");
       ioman->Register("Digi_AdvTargetHits", "DigiAdvTargetHit_det", AdvTargetHits, kTRUE);
       // Branch containing links to MC truth info
@@ -432,6 +437,16 @@ int DigiTaskSND::Saturate(int signal)
         else if (signal < 0) signal = 0;
     }
     return signal;
+}
+
+void DigiTaskSND::WriteConfig()
+{
+    std::ifstream in("advsndsw/shipLHC/digitisation/SiDigiParameters.h"); 
+    std::stringstream ss; 
+    ss << in.rdbuf();
+    TObjString* params = new TObjString(ss.str().c_str());
+    params->Write("parameters");
+
 }
 
 void DigiTaskSND::digitizeScifi()
